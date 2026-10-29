@@ -67,4 +67,54 @@ PCN 1234-5678-9012-3456
 ''';
     expect(extractNameFromId(withCodes), isNull);
   });
+
+  test('Makabagong PhilID: APELYIDO / MGA PANGALAN / GITNANG APELYIDO', () {
+    // Eksaktong layout ng bagong PhilID — walang SURNAME/GIVEN NAME na label,
+    // kaya dating bumabagsak ito sa fallback at napipili ang OCR garbage.
+    const ocr = '''
+REPUBLIKA NG PILIPINAS
+Republic of the Philippines
+PAMBANSANG PAGKAKAKILANLAN
+Philippine National ID
+APELYIDO / LAST NAME
+PAGLINAWAN
+MGA PANGALAN / GIVEN NAMES
+ARNOLD
+GITNANG APELYIDO / MIDDLE NAME
+GORGONIO
+PETSA NG KAPANGANAKAN / DATE OF BIRTH
+April 01, 1989
+TIRAHAN/ADDRESS
+P-MACAPAGAL, POBLACION, BACUAG, SURIGAO DEL NORTE, PHILIPPINES, 8408
+''';
+    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+  });
+
+  test('PhilID na may OCR noise sa label (APELYDO, PANGALAN)', () {
+    const ocr = '''
+APELYDO / LAST NAME
+PAGLINAWAN
+MGA PANGALAN / GIVEN NAMES
+ARNOLD
+GITNANG APELYDO / MIDDLE NAME
+GORGONIO
+POBLACION, BACUAG
+''';
+    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+  });
+
+  test('PhilID na nasa kaparehong linya ang label at halaga', () {
+    const ocr = '''
+APELYIDO / LAST NAME PAGLINAWAN
+MGA PANGALAN / GIVEN NAMES ARNOLD
+GITNANG APELYIDO / MIDDLE NAME GORGONIO
+POBLACION, BACUAG
+''';
+    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+  });
+
+  test('OCR garbage ay hindi nagiging pangalan (all-caps lamang)', () {
+    // Ito ang aktwal na maling output bago ang fix.
+    expect(extractNameFromId('Bd Raveansanc Ckakakiialay Y.'), isNull);
+  });
 }

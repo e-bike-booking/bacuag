@@ -441,6 +441,14 @@ String _titleCaseName(String s) => s
         .join('-'))
     .join(' ');
 
+/// True kapag ang linya ay naka-all-caps (gaya ng naka-print sa ID).
+/// Pinipigilan ang OCR garbage na maging "pangalan" sa mga fallback path.
+bool _isUpperNameLine(String line) {
+  final letters = RegExp(r'[A-Za-z]').allMatches(line).length;
+  if (letters < 4) return false;
+  return line == line.toUpperCase();
+}
+
 /// Kinukuha ang tunay na pangalan mula sa OCR text ng ID.
 /// Pure logic — walang ML Kit, kaya unit-testable. Null kapag walang mahanap.
 String? extractNameFromId(String rawText) {
@@ -466,47 +474,90 @@ String? extractNameFromId(String rawText) {
 
   // Mga linya na hindi pangalan (header, label, address, atbp.).
   final blocklist = RegExp(
-    r'REPUBLIKA|REPUBLIC|PILIPINAS|PHILIPPINES|PHILIPPINE|IDENTIFICATION|IDENTITY|AUTHORITY|STATISTICS|CARD|DATE|BIRTH|SEX|GENDER|CITIZEN|NATIONALITY|ADDRESS|POBLACION|BACUAG|SURIGAO|DEL NORTE|FILIPINO|MALE|FEMALE|PHOTO|SIGNATURE|SPECIMEN|COMMISSION|ELECTION|VOTER|REGISTRATION|PRECINCT|SERIES|FILE NO|SURNAME|GIVEN|FIRST NAME|MIDDLE NAME',
+    r'REPUBLIKA|REPUBLIC|PILIPINAS|PHILIPPINES|PHILIPPINE|IDENTIFICATION|IDENTITY|AUTHORITY|STATISTICS|CARD|DATE|BIRTH|SEX|GENDER|CITIZEN|NATIONALITY|ADDRESS|POBLACION|BACUAG|SURIGAO|DEL NORTE|FILIPINO|MALE|FEMALE|PHOTO|SIGNATURE|SPECIMEN|COMMISSION|ELECTION|VOTER|REGISTRATION|PRECINCT|SERIES|FILE NO|SURNAME|GIVEN|FIRST NAME|MIDDLE NAME|APELYIDO|PANGALAN|GITNANG|LAST NAME',
     caseSensitive: false,
   );
 
-  // 1) National ID (PhilID): magkahiwalay na linya ang label at halaga —
-  //    SURNAME / GIVEN NAME (FIRST NAME) / MIDDLE NAME.
+  // 1) National ID (PhilID): kilala ang TUNAY na label ng card — sa makabagong
+  //    PhilID ay "APELYIDO / LAST NAME", "MGA PANGALAN / GIVEN NAMES", at
+  //    "GITNANG APELYIDO / MIDDLE NAME" (pati ang dating "SURNAME / GIVEN NAME
+  //    / MIDDLE NAME"). May typo tolerance dahil maaaring maling basahin ng OCR
+  //    ang mga label.
   String? surname;
   String? given;
   String? middle;
+
+  bool hasPhrase(String u, String phrase) =>
+      phrase.split(' ').every((w) => containsWord(u, w));
+
+  // gitna muna: nasa loob ng "GITNANG APELYIDO" ang salitang APELYIDO, kaya
+  // dapat maunang masuri bago ito mahulog sa surname.
+  String? classifyLabel(String u) {
+    const mid = ['GITNANG APELYIDO', 'MIDDLE NAME', 'MIDDLE INITIAL'];
+    const giv = ['MGA PANGALAN', 'GIVEN NAME', 'FIRST NAME'];
+    const sur = ['APELYIDO', 'SURNAME', 'LAST NAME'];
+    if (mid.any((k) => hasPhrase(u, k))) return 'middle';
+    if (giv.any((k) => hasPhrase(u, k))) return 'given';
+    if (sur.any((k) => hasPhrase(u, k))) return 'surname';
+    return null;
+  }
+
+  // Mga salita ng label na tinatanggal sa kaparehong linya ng halaga
+  // ("APELYIDO / LAST NAME PAGLINAWAN" -> "PAGLINAWAN").
+  final labelWords = {
+    'MGA', 'APELYIDO', 'SURNAME', 'GIVEN', 'NAME', 'NAMES', 'FIRST', 'MIDDLE',
+    'INITIAL', 'GITNANG', 'PANGALAN', 'LAST',
+  };
+
+  // Halaga na nasa SUSUNOD na linya ng label.
   String? valueAfter(int labelIndex) {
     for (var k = labelIndex + 1;
         k < lines.length && k <= labelIndex + 2;
         k++) {
-      if (blocklist.hasMatch(lines[k].toUpperCase())) return null;
+      final up = lines[k].toUpperCase();
+      if (blocklist.hasMatch(up)) return null;
+      if (classifyLabel(up) != null) continue;
       final cand = clean(lines[k]);
-      if (cand.isNotEmpty && looksLikeNameValue(cand)) return cand;
+      // Dapat all-caps (gaya ng naka-print sa ID) ang halaga — hindi ito
+      // makakakuha ng OCR garbage bilang pangalan.
+      if (cand.isNotEmpty &&
+          looksLikeNameValue(cand) &&
+          _isUpperNameLine(lines[k])) {
+        return cand;
+      }
     }
     return null;
   }
 
-  // Halaga na nasa KAPAREHONG linya ng label ("SURNAME: DELA CRUZ").
-  String? sameLineValue(String u, String labelPattern) {
-    final m = RegExp('^$labelPattern\\s*[:\\-]?\\s*(.*)\$').firstMatch(u);
-    if (m == null) return null;
-    // Ang huling group ang laging halaga (may mga label na may sariling
-    // capture group, hal. "(GIVEN|FIRST)\\s*NAME").
-    final cand = clean(m.group(m.groupCount) ?? '');
-    return (cand.isNotEmpty && looksLikeNameValue(cand)) ? cand : null;
-  }
-
   for (var i = 0; i < lines.length; i++) {
     final u = lines[i].toUpperCase();
-    if (RegExp(r'^SURNAME').hasMatch(u)) {
-      surname ??= sameLineValue(u, r'SURNAME') ?? valueAfter(i);
+    final kind = classifyLabel(u);
+    if (kind == null) continue;
+    // Kapag nasa kaparehong linya ang label at halaga, kunin ang lahat ng
+    // salita MULA SA UNANG hindi-label (OCR-tolerant) — doon nagsisimula ang
+    // pangalan ("MGA PANGALAN / GIVEN NAMES GAVIN" -> "GAVIN").
+    final toks = u
+        .split(RegExp(r'[\s/]+'))
+        .map((w) => w.replaceAll(RegExp(r'[^A-Z]'), ''))
+        .where((w) => w.isNotEmpty)
+        .toList();
+    var firstValue = toks.length;
+    for (var t = 0; t < toks.length; t++) {
+      if (!labelWords.any((lw) => containsWord(toks[t], lw))) {
+        firstValue = t;
+        break;
+      }
     }
-    if (RegExp(r'^(GIVEN|FIRST)\s*NAME').hasMatch(u)) {
-      given ??= sameLineValue(u, r'(GIVEN|FIRST)\s*NAME') ?? valueAfter(i);
-    }
-    if (RegExp(r'^MIDDLE\s*NAME').hasMatch(u)) {
-      middle ??= sameLineValue(u, r'MIDDLE\s*NAME') ?? valueAfter(i);
-    }
+    final sameLine = clean(toks.sublist(firstValue).join(' '));
+    final sameOk = firstValue > 0 &&
+        sameLine.isNotEmpty &&
+        looksLikeNameValue(sameLine) &&
+        sameLine.replaceAll(RegExp(r'[^A-Za-z]'), '').length >= 3;
+    final v = (sameOk ? sameLine : null) ?? valueAfter(i);
+    if (v == null || v.isEmpty) continue;
+    if (kind == 'surname') surname ??= v;
+    if (kind == 'given') given ??= v;
+    if (kind == 'middle') middle ??= v;
   }
   if (given != null && surname != null) {
     final full = [
@@ -539,7 +590,12 @@ String? extractNameFromId(String rawText) {
         return _titleCaseName('$rest $last');
       }
     }
-    if (looksLikeNameValue(l, minWords: 2)) return _titleCaseName(clean(l));
+    // OCR garbage (hal. "Bd Raveansanc Ckakakiialay Y.") ay halos laging
+    // mixed-case; ang naka-print sa ID ay all-caps kaya hindi ito papasa —
+    // mas mabuti nang walang pangalan kaysa maling pangalan.
+    if (looksLikeNameValue(l, minWords: 2) && _isUpperNameLine(l)) {
+      return _titleCaseName(clean(l));
+    }
   }
   return null;
 }

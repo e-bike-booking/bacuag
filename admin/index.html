@@ -939,29 +939,64 @@
                 if (words.length < minWords || words.length > 4) return false;
                 return words.every(w => /^[A-Za-z][A-Za-z.'-]*$/.test(w));
             };
-            const BLOCK = /REPUBLIKA|REPUBLIC|PILIPINAS|PHILIPPINES|PHILIPPINE|IDENTIFICATION|IDENTITY|AUTHORITY|STATISTICS|CARD|DATE|BIRTH|SEX|GENDER|CITIZEN|NATIONALITY|ADDRESS|POBLACION|BACUAG|SURIGAO|DEL NORTE|FILIPINO|MALE|FEMALE|PHOTO|SIGNATURE|SPECIMEN|COMMISSION|ELECTION|VOTER|REGISTRATION|PRECINCT|SERIES|FILE NO|SURNAME|GIVEN|FIRST NAME|MIDDLE NAME/i;
+            const BLOCK = /REPUBLIKA|REPUBLIC|PILIPINAS|PHILIPPINES|PHILIPPINE|IDENTIFICATION|IDENTITY|AUTHORITY|STATISTICS|CARD|DATE|BIRTH|SEX|GENDER|CITIZEN|NATIONALITY|ADDRESS|POBLACION|BACUAG|SURIGAO|DEL NORTE|FILIPINO|MALE|FEMALE|PHOTO|SIGNATURE|SPECIMEN|COMMISSION|ELECTION|VOTER|REGISTRATION|PRECINCT|SERIES|FILE NO|SURNAME|GIVEN|FIRST NAME|MIDDLE NAME|APELYIDO|PANGALAN|GITNANG|LAST NAME/i;
+
+            // Makabagong PhilID label: "APELYIDO / LAST NAME", "MGA PANGALAN /
+            // GIVEN NAMES", "GITNANG APELYIDO / MIDDLE NAME" (pati ang dating
+            // "SURNAME / GIVEN NAME / MIDDLE NAME"). May typo tolerance dahil
+            // maaaring maling basahin ng OCR ang mga label.
+            const hasPhrase = (u, phrase) => phrase.split(' ').every(w => containsWord(u, w));
+            const classifyLabel = (u) => {
+                if (['GITNANG APELYIDO', 'MIDDLE NAME', 'MIDDLE INITIAL'].some(k => hasPhrase(u, k))) return 'middle';
+                if (['MGA PANGALAN', 'GIVEN NAME', 'FIRST NAME'].some(k => hasPhrase(u, k))) return 'given';
+                if (['APELYIDO', 'SURNAME', 'LAST NAME'].some(k => hasPhrase(u, k))) return 'surname';
+                return null;
+            };
+            const LABEL_WORDS = new Set(['MGA', 'APELYIDO', 'SURNAME', 'GIVEN', 'NAME', 'NAMES',
+                'FIRST', 'MIDDLE', 'INITIAL', 'GITNANG', 'PANGALAN', 'LAST']);
+            const isUpperNameLine = (line) => {
+                if ((line.match(/[A-Za-z]/g) || []).length < 4) return false;
+                return line === line.toUpperCase();
+            };
 
             const valueAfter = (idx) => {
                 for (let k = idx + 1; k < lines.length && k <= idx + 2; k++) {
-                    if (BLOCK.test(lines[k].toUpperCase())) return null;
+                    const up = lines[k].toUpperCase();
+                    if (BLOCK.test(up)) return null;
+                    if (classifyLabel(up)) continue;
                     const cand = clean(lines[k]);
-                    if (cand && looksLikeNameValue(cand)) return cand;
+                    // All-caps (gaya ng naka-print sa ID) lang ang tinatanggap —
+                    // hindi makakakuha ng OCR garbage bilang pangalan.
+                    if (cand && looksLikeNameValue(cand) && isUpperNameLine(lines[k])) return cand;
                 }
                 return null;
-            };
-            const sameLineValue = (u, labelPattern) => {
-                const m = new RegExp('^' + labelPattern + '\\s*[:\\-]?\\s*(.*)$').exec(u);
-                if (!m) return null;
-                const cand = clean(m[m.length - 1] || '');
-                return (cand && looksLikeNameValue(cand)) ? cand : null;
             };
 
             let surname = null, given = null, middle = null;
             for (let i = 0; i < lines.length; i++) {
                 const u = lines[i].toUpperCase();
-                if (/^SURNAME/.test(u)) surname = surname || sameLineValue(u, 'SURNAME') || valueAfter(i);
-                if (/^(GIVEN|FIRST)\s*NAME/.test(u)) given = given || sameLineValue(u, '(GIVEN|FIRST)\\s*NAME') || valueAfter(i);
-                if (/^MIDDLE\s*NAME/.test(u)) middle = middle || sameLineValue(u, 'MIDDLE\\s*NAME') || valueAfter(i);
+                const kind = classifyLabel(u);
+                if (!kind) continue;
+                // Kapag nasa kaparehong linya ang label at halaga, alisin ang
+                // mga salita ng label para ang natitira ay ang pangalan lamang.
+                // Kapag nasa kaparehong linya ang label at halaga, kunin ang
+                // lahat ng salita MULA SA UNANG hindi-label (OCR-tolerant) —
+                // doon nagsisimula ang pangalan.
+                const toks = u.split(/[\s/]+/)
+                    .map(w => w.replace(/[^A-Z]/g, ''))
+                    .filter(Boolean);
+                let firstValue = toks.length;
+                for (let t = 0; t < toks.length; t++) {
+                    if (![...LABEL_WORDS].some(lw => containsWord(toks[t], lw))) { firstValue = t; break; }
+                }
+                const sameLine = clean(toks.slice(firstValue).join(' '));
+                const sameOk = firstValue > 0 && sameLine && looksLikeNameValue(sameLine) &&
+                    sameLine.replace(/[^A-Za-z]/g, '').length >= 3;
+                const v = (sameOk ? sameLine : null) || valueAfter(i);
+                if (!v) continue;
+                if (kind === 'surname') surname = surname || v;
+                if (kind === 'given') given = given || v;
+                if (kind === 'middle') middle = middle || v;
             }
             if (given && surname) {
                 return titleCaseName([given, (middle || ''), surname].filter(Boolean).join(' '));
@@ -985,7 +1020,9 @@
                         return titleCaseName(rest + ' ' + last);
                     }
                 }
-                if (looksLikeNameValue(l, 2)) return titleCaseName(clean(l));
+                // Mixed-case na basura mula sa OCR ay hindi papasa — all-caps
+                // lang (gaya ng naka-print sa ID).
+                if (looksLikeNameValue(l, 2) && isUpperNameLine(l)) return titleCaseName(clean(l));
             }
             return null;
         }
