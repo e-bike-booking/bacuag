@@ -43,13 +43,17 @@
     <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
             <div class="flex items-center space-x-3">
+                <span id="brand-logo-container" class="bg-white p-1 rounded-2xl shadow-md border border-white/70 inline-flex items-center justify-center shrink-0">
+                    <svg id="brand-logo-svg" class="w-12 h-12 block"><use href="#sakay-bacuag-logo"/></svg>
+                    <img id="brand-logo-img" src="" alt="Logo" class="w-12 h-12 object-cover rounded-xl hidden">
+                </span>
                 <div>
                     <span class="text-2xl font-black tracking-tight">E-Bike</span>
                     <span class="block text-xs text-emerald-200">Bacuag, Surigao del Norte</span>
                 </div>
             </div>
             <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
-                <a href="#features" class="hover:text-emerald-200 transition">Mga Tampok</a>
+                <a href="#features" class="hover:text-emerald-200 transition">Bakit E-Bike?</a>
                 <a href="#app-preview" class="hover:text-emerald-200 transition">App Functions</a>
                 <a href="#signup" class="hover:text-emerald-200 transition">Mag-Sign Up</a>
                 <a href="#about" class="hover:text-emerald-200 transition">Tungkol sa App</a>
@@ -98,12 +102,12 @@
                     </div>
                     <div class="bg-emerald-900/60 p-4 rounded-2xl space-y-3">
                         <div class="flex items-center justify-between">
-                            <span class="font-bold text-sm">🛺 E-Bike #BK-10892</span>
-                            <span class="bg-green-500/20 text-green-300 text-xs px-2 py-0.5 rounded">On the way</span>
+                            <span id="dispatch-id" class="font-bold text-sm">🛺 E-Bike #BK-10892</span>
+                            <span id="dispatch-status" class="bg-green-500/20 text-green-300 text-xs px-2 py-0.5 rounded">On the way</span>
                         </div>
-                        <p class="text-xs text-emerald-100">Pasahero: Maria Santos<br>Pickup: Poblacion Bacuag Pin</p>
+                        <p id="dispatch-details" class="text-xs text-emerald-100">Pasahero: Maria Santos<br>Pickup: Poblacion Bacuag Pin</p>
                         <div class="w-full bg-emerald-800 h-2 rounded-full overflow-hidden">
-                            <div class="bg-green-400 h-full w-3/4 animate-pulse"></div>
+                            <div id="dispatch-progress" class="bg-green-400 h-full w-3/4 animate-pulse" style="width:75%"></div>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-3 text-center">
@@ -283,10 +287,18 @@
                     <input type="password" id="su-pass" required minlength="6" class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="••••••••">
                 </div>
                 <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Uri ng Verified ID</label>
+                    <select id="su-idtype" class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                        <option value="National ID">Philippine National ID</option>
+                        <option value="Voter ID">COMELEC Voter's ID</option>
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs font-bold uppercase mb-1">Verified ID (Litrato ng Valid ID)</label>
                     <input type="file" id="su-id" accept="image/*" required class="w-full px-4 py-2 rounded-xl bg-white/90 text-gray-900 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white file:font-bold file:text-xs">
-                    <p class="text-[11px] text-emerald-100 mt-1">Kunan o piliin ang malinaw na larawan ng iyong Valid ID (Bacuag resident) — ito ang beripikasyon bago ka tuluyang ma-activate.</p>
+                    <p class="text-[11px] text-emerald-100 mt-1">Kunan o piliin ang malinaw na larawan ng iyong Valid ID (Bacuag resident) — i-scan ito ng OCR tulad sa mobile app: dapat nababasa ang address na POBLACION, BACUAG.</p>
                     <img id="su-id-preview" class="hidden mt-3 h-24 rounded-xl border-2 border-emerald-400/60 object-cover" alt="Verified ID preview">
+                    <p id="su-id-status" class="text-[12px] font-bold mt-2 min-h-[16px] text-emerald-100"></p>
                 </div>
                 <button type="submit" class="w-full bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold py-3.5 rounded-xl shadow-lg transition text-sm">
                     Mag-register sa E-Bike
@@ -609,17 +621,17 @@
     <!-- Footer -->
     <footer class="bg-gray-900 text-gray-400 py-12 px-4 text-center">
         <div class="max-w-7xl mx-auto space-y-4">
-            <div class="inline-flex items-center justify-center gap-4 text-white">
-                <span id="brand-logo-container" class="bg-white p-1.5 rounded-3xl shadow-xl border-2 border-white/60 inline-flex items-center justify-center">
-                    <svg id="brand-logo-svg" class="w-28 h-28 block"><use href="#sakay-bacuag-logo"/></svg>
-                    <img id="brand-logo-img" src="" alt="Logo" class="w-28 h-28 object-cover rounded-2xl hidden">
-                </span>
-                <span class="text-4xl font-black tracking-tight">E-Bike</span>
+            <div class="flex items-center justify-center space-x-2 text-white font-bold text-lg">
+                <svg class="w-7 h-7"><use href="#sakay-bacuag-logo"/></svg>
+                <span>E-Bike</span>
             </div>
             <p class="text-xs text-gray-500">Opisyal na E-Bike Passenger, Rider, at LGU Admin Portal. Borne for Bacuag, Surigao del Norte.</p>
             <p class="text-xs text-gray-600">&copy; 2025 E-Bike. All rights reserved. Hosted via GitHub Pages.</p>
         </div>
     </footer>
+
+    <!-- OCR para sa Verified ID scan (kapareho ng ML Kit function sa mobile app) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 
     <!-- JavaScript & LocalStorage Sync Logic -->
     <script>
@@ -835,7 +847,7 @@
             });
         }
 
-        // Preview ng Verified ID habang pinipili pa lang.
+        // Preview ng Verified ID + AWTOMATIKONG SCAN (OCR) habang pinipili pa lang.
         const suIdInput = document.getElementById('su-id');
         if (suIdInput) {
             suIdInput.addEventListener('change', () => {
@@ -845,7 +857,206 @@
                 if (!file) { preview.classList.add('hidden'); return; }
                 preview.src = URL.createObjectURL(file);
                 preview.classList.remove('hidden');
+                verifyVerifiedId(file);
             });
+        }
+        // Pagpapalit ng Uri ng ID -> kailangang mag-scan ulit (gaya ng app).
+        const suIdType = document.getElementById('su-idtype');
+        if (suIdType) {
+            suIdType.addEventListener('change', () => {
+                idScanState = { valid: false, name: '', busy: false,
+                    message: 'Palitan ang Uri ng ID - i-scan ulit ang litrato.' };
+                const st = document.getElementById('su-id-status');
+                if (st) st.textContent = 'Palitan ang Uri ng ID - i-scan ulit ang litrato.';
+            });
+        }
+
+        // ---------------------------------------------------------------------------
+        // VERIFIED ID SCAN (web) - kapareho ng function ng mobile app (ML Kit):
+        // OCR (Tesseract.js) -> POBLACION + BACUAG (may typo tolerance),
+        // pagkilala sa klase ng ID (National ID / Voter's ID), at auto-fill ng
+        // pangalan mula sa ID. Walang matatanggap na ID na walang scan.
+        // ---------------------------------------------------------------------------
+        let idScanState = { valid: false, name: '', busy: false, message: '' };
+
+        const NATIONAL_ID_MARKERS = ['PHILIPPINE IDENTIFICATION CARD', 'PHILIPPINE IDENTIFICATION', 'PHILSYS', 'PHIL ID', 'PHILID', 'PCN'];
+        const VOTER_ID_MARKERS = ['COMMISSION ON ELECTIONS', 'COMELEC', 'VOTER S ID', 'VOTERS ID', 'VOTER ID', 'VOTER S IDENTIFICATION', 'PRECINCT'];
+
+        function normalizeOcr(input) {
+            return String(input || '').toUpperCase().replace(/[^A-Z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim();
+        }
+
+        function levDistance(a, b) {
+            if (a === b) return 0;
+            if (!a.length) return b.length;
+            if (!b.length) return a.length;
+            let prev = Array.from({ length: b.length + 1 }, (_, i) => i);
+            for (let i = 1; i <= a.length; i++) {
+                const curr = [i];
+                for (let j = 1; j <= b.length; j++) {
+                    const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+                    curr[j] = Math.min(curr[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+                }
+                prev = curr;
+            }
+            return prev[b.length];
+        }
+
+        function containsWord(normalizedText, word, tolerance = 2) {
+            if (normalizedText.includes(word)) return true;
+            for (const token of normalizedText.split(' ')) {
+                if (Math.abs(token.length - word.length) > tolerance) continue;
+                if (levDistance(token, word) <= tolerance) return true;
+            }
+            return false;
+        }
+
+        function hasMarker(normalizedText, marker) {
+            return marker.includes(' ') ? normalizedText.includes(marker) : containsWord(normalizedText, marker);
+        }
+
+        function textSnippet(text) {
+            const flat = String(text || '').replace(/\s+/g, ' ').trim();
+            if (!flat) return '(walang nabasang text)';
+            return flat.length <= 110 ? flat : flat.substring(0, 110) + '...';
+        }
+
+        function titleCaseName(s) {
+            return String(s).split(/\s+/).filter(Boolean).map(w =>
+                w.split('-').map(p => p ? p[0].toUpperCase() + p.slice(1).toLowerCase() : p).join('-')
+            ).join(' ');
+        }
+
+        // Kapareho ng extractNameFromId() sa lib/main.dart.
+        function extractNameFromId(rawText) {
+            if (!String(rawText || '').trim()) return null;
+            const lines = String(rawText).split('\n').map(l => l.trim()).filter(l => l);
+            const clean = s => s.replace(/[^A-Za-z .,'-]/g, '').trim();
+            const looksLikeNameValue = (s, minWords = 1) => {
+                const c = clean(s);
+                if (!c) return false;
+                const words = c.split(/[\s,]+/).filter(Boolean);
+                if (words.length < minWords || words.length > 4) return false;
+                return words.every(w => /^[A-Za-z][A-Za-z.'-]*$/.test(w));
+            };
+            const BLOCK = /REPUBLIKA|REPUBLIC|PILIPINAS|PHILIPPINES|PHILIPPINE|IDENTIFICATION|IDENTITY|AUTHORITY|STATISTICS|CARD|DATE|BIRTH|SEX|GENDER|CITIZEN|NATIONALITY|ADDRESS|POBLACION|BACUAG|SURIGAO|DEL NORTE|FILIPINO|MALE|FEMALE|PHOTO|SIGNATURE|SPECIMEN|COMMISSION|ELECTION|VOTER|REGISTRATION|PRECINCT|SERIES|FILE NO|SURNAME|GIVEN|FIRST NAME|MIDDLE NAME/i;
+
+            const valueAfter = (idx) => {
+                for (let k = idx + 1; k < lines.length && k <= idx + 2; k++) {
+                    if (BLOCK.test(lines[k].toUpperCase())) return null;
+                    const cand = clean(lines[k]);
+                    if (cand && looksLikeNameValue(cand)) return cand;
+                }
+                return null;
+            };
+            const sameLineValue = (u, labelPattern) => {
+                const m = new RegExp('^' + labelPattern + '\\s*[:\\-]?\\s*(.*)$').exec(u);
+                if (!m) return null;
+                const cand = clean(m[m.length - 1] || '');
+                return (cand && looksLikeNameValue(cand)) ? cand : null;
+            };
+
+            let surname = null, given = null, middle = null;
+            for (let i = 0; i < lines.length; i++) {
+                const u = lines[i].toUpperCase();
+                if (/^SURNAME/.test(u)) surname = surname || sameLineValue(u, 'SURNAME') || valueAfter(i);
+                if (/^(GIVEN|FIRST)\s*NAME/.test(u)) given = given || sameLineValue(u, '(GIVEN|FIRST)\\s*NAME') || valueAfter(i);
+                if (/^MIDDLE\s*NAME/.test(u)) middle = middle || sameLineValue(u, 'MIDDLE\\s*NAME') || valueAfter(i);
+            }
+            if (given && surname) {
+                return titleCaseName([given, (middle || ''), surname].filter(Boolean).join(' '));
+            }
+
+            for (const l of lines) {
+                const m = /^NAME\s*[:\-]\s*(.+)$/i.exec(l);
+                if (m) {
+                    const cand = clean(m[1]);
+                    if (looksLikeNameValue(cand)) return titleCaseName(cand);
+                }
+            }
+
+            for (const l of lines) {
+                if (BLOCK.test(l.toUpperCase())) continue;
+                const comma = l.split(',');
+                if (comma.length >= 2) {
+                    const last = clean(comma[0]);
+                    const rest = clean(comma.slice(1).join(' '));
+                    if (looksLikeNameValue(last, 2) && looksLikeNameValue(rest, 2)) {
+                        return titleCaseName(rest + ' ' + last);
+                    }
+                }
+                if (looksLikeNameValue(l, 2)) return titleCaseName(clean(l));
+            }
+            return null;
+        }
+
+        // Kapareho ng evaluateIdText() sa lib/main.dart.
+        function evaluateIdText(rawText, selectedIdType) {
+            if (!String(rawText || '').trim()) {
+                return { valid: false, message: 'Walang nabasang text sa larawan. Baka malabo o kulang sa liwanag - kunan po ulit ng buo at malinaw na litrato ang ID.' };
+            }
+            const norm = normalizeOcr(rawText);
+            const hasPoblacion = containsWord(norm, 'POBLACION');
+            const hasBacuag = containsWord(norm, 'BACUAG');
+            if (!hasPoblacion || !hasBacuag) {
+                const missing = (!hasPoblacion && !hasBacuag) ? "ang 'Poblacion' at 'Bacuag'" : (!hasPoblacion ? "ang 'Poblacion'" : "ang 'Bacuag'");
+                return { valid: false, message: 'Hindi nababasa ' + missing + ' sa address ng ID. Residente ng Poblacion, Bacuag lamang ang maaaring mag-sign up. Subukang kunan ng mas malinaw na litrato. Nabasang text: ' + textSnippet(rawText) };
+            }
+            const nat = NATIONAL_ID_MARKERS.filter(m => hasMarker(norm, m)).length;
+            const vot = VOTER_ID_MARKERS.filter(m => hasMarker(norm, m)).length;
+            let detected = null;
+            if (nat > vot && nat > 0) detected = 'National ID';
+            else if (vot > nat) detected = 'Voter ID';
+            if (!detected) {
+                return { valid: false, message: 'Hindi makilala kung National ID o Voter\'s ID ang na-scan, kaya hindi ito maaaring tanggapin. Pakikita ang buong card (kasama ang header) sa malinaw na litrato. Nabasang text: ' + textSnippet(rawText) };
+            }
+            if (detected !== selectedIdType) {
+                return { valid: false, message: 'Ang nabasang card ay ' + detected + ', ngunit ' + selectedIdType + ' ang napili sa dropdown. Pakiayon ang Uri ng ID at ulitin ang scan.' };
+            }
+            return { valid: true, detectedIdType: detected, message: 'Beripikado: Na-scan ang ' + selectedIdType + ' at nakumpirma ang Address: POBLACION, BACUAG - Poblacion, Bacuag resident. Na-aprubahan na.' };
+        }
+
+        async function runIdOcr(file, onProgress) {
+            if (typeof Tesseract === 'undefined') {
+                throw new Error('Walang OCR library - kailangan ng internet sa unang beses (Tesseract.js CDN).');
+            }
+            const worker = await Tesseract.createWorker('eng', 1, {
+                logger: m => { if (onProgress && m.status === 'recognizing text') onProgress(m.progress || 0); }
+            });
+            try {
+                const { data } = await worker.recognize(file);
+                return data.text || '';
+            } finally {
+                try { await worker.terminate(); } catch (_) {}
+            }
+        }
+
+        async function verifyVerifiedId(file) {
+            const status = document.getElementById('su-id-status');
+            const set = html => { if (status) status.innerHTML = html; };
+            idScanState = { valid: false, name: '', busy: true, message: '' };
+            set('Sinusuri ang Verified ID (OCR)... <span id="su-id-pct">0%</span>');
+            try {
+                const text = await runIdOcr(file, p => {
+                    const el = document.getElementById('su-id-pct');
+                    if (el) el.textContent = Math.round(p * 100) + '%';
+                });
+                const selected = (document.getElementById('su-idtype') || {}).value || 'National ID';
+                const result = evaluateIdText(text, selected);
+                const detectedName = result.valid ? extractNameFromId(text) : null;
+                idScanState = { valid: !!result.valid, name: detectedName || '', busy: false, message: result.message };
+                if (result.valid && detectedName) {
+                    const nameInput = document.getElementById('su-name');
+                    if (nameInput && !nameInput.value.trim()) nameInput.value = detectedName;
+                }
+                set('<span style="color:' + (result.valid ? '#86efac' : '#fecaca') + '">' +
+                    escapeHtml(result.message) +
+                    (result.valid && detectedName ? '<br>Na-fill ang Buong Pangalan mula sa ID: ' + escapeHtml(detectedName) + '.' : '') +
+                    '</span>');
+            } catch (e) {
+                idScanState = { valid: false, name: '', busy: false, message: 'Hindi ma-scan ang ID (' + e.message + '). Subukan muli o gumamit ng ibang litrato.' };
+                set('<span style="color:#fecaca">' + escapeHtml(idScanState.message) + '</span>');
+            }
         }
 
         async function handleSignup(event) {
@@ -863,6 +1074,15 @@
             }
             if (!idFile) {
                 alert('Kailangan ang Verified ID — pumili ng litrato ng iyong Valid ID.');
+                return;
+            }
+            if (idScanState.busy) {
+                alert('Sinusuri pa ang Verified ID - maghintay ng ilang segundo.');
+                return;
+            }
+            if (!idScanState.valid) {
+                alert(idScanState.message ||
+                    'Hindi pa na-verify ang Verified ID. I-scan muna ito (OCR) — dapat nababasa ang POBLACION, BACUAG sa litrato.');
                 return;
             }
 
@@ -1059,6 +1279,56 @@
             loadAdminUsers();
             loadBookings();
             renderBoundary();
+            renderDispatch();
+        }
+
+        // ---------------------------------------------------------------------------
+        // LIVE BACUAG DISPATCH (hero card) — hindi na hardcoded: ang ipinapakita
+        // dito ay ang TOTOONG pinakabagong aktibong booking mula sa app
+        // (sakay_bookings_v1), na may status at progress bar na base sa estado
+        // ng biyahe. Awtomatikong nagre-refresh kapag may bagong booking.
+        // ---------------------------------------------------------------------------
+        const DISPATCH_ACTIVE = ['pending', 'accepted', 'on_the_way', 'arrived'];
+
+        function renderDispatch() {
+            const idEl = document.getElementById('dispatch-id');
+            const statusEl = document.getElementById('dispatch-status');
+            const detEl = document.getElementById('dispatch-details');
+            const barEl = document.getElementById('dispatch-progress');
+            if (!idEl || !statusEl || !detEl || !barEl) return;
+
+            const bookings = getAppBookings();
+            const live = bookings.filter(b => DISPATCH_ACTIVE.includes(String(b.status || 'pending')));
+            const b = live[0] || null;
+
+            if (!b) {
+                idEl.textContent = 'Walang aktibong biyahe';
+                statusEl.textContent = 'Idle';
+                statusEl.className = 'bg-white/10 text-emerald-200 text-xs px-2 py-0.5 rounded';
+                detEl.innerHTML = 'Walang booking ngayon sa Poblacion Bacuag.<br>Buksan ang app para mag-book ng E-Bike.';
+                barEl.style.width = '0%';
+                barEl.classList.remove('animate-pulse');
+                return;
+            }
+
+            const st = String(b.status || 'pending');
+            const tone = {
+                pending: ['bg-yellow-500/20 text-yellow-300', 15, 'Pending'],
+                accepted: ['bg-blue-500/20 text-blue-300', 35, 'Accepted'],
+                on_the_way: ['bg-green-500/20 text-green-300', 65, 'On the way'],
+                arrived: ['bg-green-500/20 text-green-300', 85, 'Arrived'],
+            }[st] || ['bg-white/10 text-emerald-200', 15, st];
+
+            idEl.textContent = 'E-Bike #' + escapeHtml(String(b.id || '-'));
+            statusEl.textContent = tone[2];
+            statusEl.className = tone[0] + ' text-xs px-2 py-0.5 rounded';
+
+            const pu = (Array.isArray(b.pickup) && b.pickup.length >= 2)
+                ? Number(b.pickup[0]).toFixed(4) + ', ' + Number(b.pickup[1]).toFixed(4) + ' - Poblacion Center'
+                : 'Poblacion Bacuag Pin';
+            detEl.innerHTML = 'Pasahero: ' + escapeHtml(b.name || '-') + '<br>Pickup: ' + escapeHtml(pu);
+            barEl.style.width = tone[1] + '%';
+            barEl.classList.toggle('animate-pulse', st !== 'arrived');
         }
 
         function updateRiderStatus(email, newStatus) {
@@ -1137,11 +1407,13 @@
 
         window.addEventListener('storage', (e) => {
             if (!e.key || !SYNC_KEYS.has(e.key)) return;
+            renderDispatch(); // ang hero card ay live kahit hindi naka-open ang dashboard
             const dash = document.getElementById('dashboard-section');
             if (dash && !dash.classList.contains('hidden')) refreshDashboard();
         });
 
         boot();
+        renderDispatch(); // initial na laman ng Live Bacuag Dispatch card
     </script>
 </body>
 </html>
