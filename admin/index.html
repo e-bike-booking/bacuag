@@ -42,14 +42,14 @@
     <!-- Navbar / Header -->
     <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
                 <span id="brand-logo-container" class="bg-white p-1 rounded-2xl shadow-md border border-white/70 inline-flex items-center justify-center shrink-0">
-                    <svg id="brand-logo-svg" class="w-12 h-12 block"><use href="#sakay-bacuag-logo"/></svg>
-                    <img id="brand-logo-img" src="" alt="Logo" class="w-12 h-12 object-cover rounded-xl hidden">
+                    <svg id="brand-logo-svg" class="w-10 h-10 sm:w-12 sm:h-12 block"><use href="#sakay-bacuag-logo"/></svg>
+                    <img id="brand-logo-img" src="" alt="Logo" class="w-10 h-10 sm:w-12 sm:h-12 object-cover rounded-xl hidden">
                 </span>
-                <div>
-                    <span class="text-2xl font-black tracking-tight">E-Bike</span>
-                    <span class="block text-xs text-emerald-200">Bacuag, Surigao del Norte</span>
+                <div class="min-w-0">
+                    <span class="text-xl sm:text-2xl font-black tracking-tight whitespace-nowrap">E-Bike</span>
+                    <span class="hidden sm:block text-xs text-emerald-200 whitespace-nowrap">Bacuag, Surigao del Norte</span>
                 </div>
             </div>
             <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
@@ -63,8 +63,8 @@
                 </button>
             </nav>
             <div class="md:hidden flex items-center space-x-2">
-                <a href="#signup" class="bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-xs">Sign Up</a>
-                <button onclick="openAdminPortal()" class="bg-white text-emerald-700 px-3 py-1.5 rounded-lg font-bold text-xs">Admin</button>
+                <a href="#signup" class="bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap">Sign Up</a>
+                <button onclick="openAdminPortal()" class="bg-white text-emerald-700 px-3 py-1.5 rounded-lg font-bold text-xs whitespace-nowrap">Admin</button>
             </div>
         </div>
     </header>
@@ -254,7 +254,7 @@
     <!-- Sign Up Section -->
     <section id="signup" class="bg-emerald-900 text-white py-20 px-4 relative overflow-hidden">
         <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
-        <div class="max-w-4xl mx-auto relative z-10 bg-white/10 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/20 shadow-2xl">
+        <div class="max-w-4xl mx-auto relative z-10 bg-white/10 backdrop-blur-md p-5 sm:p-8 md:p-12 rounded-3xl border border-white/20 shadow-2xl">
             <div class="text-center max-w-xl mx-auto space-y-3 mb-8">
                 <span class="bg-emerald-600 text-emerald-100 text-xs px-3 py-1 rounded-full font-bold">Magrehistro Ngayon</span>
                 <h2 class="text-3xl font-black">Sumali sa E-Bike</h2>
@@ -950,6 +950,9 @@
                 if (['GITNANG APELYIDO', 'MIDDLE NAME', 'MIDDLE INITIAL'].some(k => hasPhrase(u, k))) return 'middle';
                 if (['MGA PANGALAN', 'GIVEN NAME', 'FIRST NAME'].some(k => hasPhrase(u, k))) return 'given';
                 if (['APELYIDO', 'SURNAME', 'LAST NAME'].some(k => hasPhrase(u, k))) return 'surname';
+                // Mahinang senyales: nag-iisang "NAMES" na lang ang nabasa ng
+                // OCR (mula sa "MGA PANGALAN / GIVEN NAMES") — given pa rin ito.
+                if (containsWord(u, 'NAMES')) return 'given';
                 return null;
             };
             const LABEL_WORDS = new Set(['MGA', 'APELYIDO', 'SURNAME', 'GIVEN', 'NAME', 'NAMES',
@@ -959,45 +962,53 @@
                 return line === line.toUpperCase();
             };
 
+            const isLabelWord = (w) => [...LABEL_WORDS].some(lw => containsWord(w.toUpperCase(), lw));
+
+            // Tunay na halaga ng pangalan sa loob ng [idx .. +2] na linya —
+            // tumigil sa unang susunod na label/address line. All-caps na
+            // salita lang (gaya ng naka-print sa ID) na may kabuuang >=2 vowels
+            // ang tinatanggap — pinipigilan ang OCR garbage (BRAT, SRSA, NER)
+            // na maging pangalan, pero tunay na halaga (PAGLINAWAN, ARNOLD)
+            // kahit may kalat na guhit sa paligid.
             const valueAfter = (idx) => {
-                for (let k = idx + 1; k < lines.length && k <= idx + 2; k++) {
+                let best = '', bestScore = 0;
+                for (let k = idx; k < lines.length && k <= idx + 2; k++) {
                     const up = lines[k].toUpperCase();
-                    if (BLOCK.test(up)) return null;
-                    if (classifyLabel(up)) continue;
-                    const cand = clean(lines[k]);
-                    // All-caps (gaya ng naka-print sa ID) lang ang tinatanggap —
-                    // hindi makakakuha ng OCR garbage bilang pangalan.
-                    if (cand && looksLikeNameValue(cand) && isUpperNameLine(lines[k])) return cand;
+                    if (k > idx) {
+                        if (classifyLabel(up)) break;   // susunod na label - tama na
+                        if (BLOCK.test(up)) break;      // address/header line na
+                    }
+                    let run = [], runScore = 0;
+                    const flush = () => {
+                        if (runScore >= 2 && runScore > bestScore) {
+                            best = run.join(' '); bestScore = runScore;
+                        }
+                        run = []; runScore = 0;
+                    };
+                    for (const t of lines[k].split(/[^A-Za-z0-9]+/)) {
+                        if (!t) continue;
+                        const isDigits = /^[0-9]+$/.test(t);
+                        const vowels = (t.match(/[AEIOUaeiou]/g) || []).length;
+                        const ok = !isDigits && t === t.toUpperCase() &&
+                            t.length >= 4 && !isLabelWord(t) && vowels >= 1;
+                        if (ok) { run.push(t); runScore += vowels; } else { flush(); }
+                    }
+                    flush();
                 }
-                return null;
+                return best || null;
             };
 
             let surname = null, given = null, middle = null;
             for (let i = 0; i < lines.length; i++) {
-                const u = lines[i].toUpperCase();
-                const kind = classifyLabel(u);
+                const kind = classifyLabel(lines[i].toUpperCase());
                 if (!kind) continue;
-                // Kapag nasa kaparehong linya ang label at halaga, alisin ang
-                // mga salita ng label para ang natitira ay ang pangalan lamang.
-                // Kapag nasa kaparehong linya ang label at halaga, kunin ang
-                // lahat ng salita MULA SA UNANG hindi-label (OCR-tolerant) —
-                // doon nagsisimula ang pangalan.
-                const toks = u.split(/[\s/]+/)
-                    .map(w => w.replace(/[^A-Z]/g, ''))
-                    .filter(Boolean);
-                let firstValue = toks.length;
-                for (let t = 0; t < toks.length; t++) {
-                    if (![...LABEL_WORDS].some(lw => containsWord(toks[t], lw))) { firstValue = t; break; }
-                }
-                const sameLine = clean(toks.slice(firstValue).join(' '));
-                const sameOk = firstValue > 0 && sameLine && looksLikeNameValue(sameLine) &&
-                    sameLine.replace(/[^A-Za-z]/g, '').length >= 3;
-                const v = (sameOk ? sameLine : null) || valueAfter(i);
+                const v = valueAfter(i);
                 if (!v) continue;
                 if (kind === 'surname') surname = surname || v;
                 if (kind === 'given') given = given || v;
                 if (kind === 'middle') middle = middle || v;
             }
+
             if (given && surname) {
                 return titleCaseName([given, (middle || ''), surname].filter(Boolean).join(' '));
             }
@@ -1016,7 +1027,7 @@
                 if (comma.length >= 2) {
                     const last = clean(comma[0]);
                     const rest = clean(comma.slice(1).join(' '));
-                    if (looksLikeNameValue(last, 2) && looksLikeNameValue(rest, 2)) {
+                    if (isUpperNameLine(l) && looksLikeNameValue(last, 2) && looksLikeNameValue(rest, 2)) {
                         return titleCaseName(rest + ' ' + last);
                     }
                 }

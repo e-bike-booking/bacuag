@@ -117,4 +117,27 @@ POBLACION, BACUAG
     // Ito ang aktwal na maling output bago ang fix.
     expect(extractNameFromId('Bd Raveansanc Ckakakiialay Y.'), isNull);
   });
+
+  test('Aktwal na OCR ng PhilID photo (may guhit/noise) — hindi na basura', () {
+    // Eksaktong kopya ng nabasa ng OCR sa totoong litrato ng ID. Bago ang fix
+    // ay "Wl I Srsa Names No X." ang na-fill — basura mula sa linyang
+    // "No x , Wl i SRSA NAMES : >" na hindi all-caps.
+    const ocr = '''
+Seo] REPUBLIKA NG PILIPINAS =u
+Bd raveansanc ckakakiiAlay  (@Y
+9259-0897-62364- od i APELYIDO/LAST NAME | i il i . n
+Re BRAT) 0 PAGLINAWAN Hi j [m] [m]
+Ned i Re ER |
+No x , Wl i SRSA NAMES : >
+NER . //1& ARNOLD il "Le, 7 oJ
+NZS J of
+NS X 4 GITNANG APELYIDO/MIDDLE NAME [mu] n
+NEON i y
+Vo _ Ii, CORGONID TL
+TIRAHAN/ADDRESS
+P-MACAPAGAL, POBLACION, BACUAG,SURIGAO DEL
+NORTE, PHILIPPINES, 8408
+''';
+    expect(extractNameFromId(ocr), 'Arnold Corgonid Paglinawan');
+  });
 }

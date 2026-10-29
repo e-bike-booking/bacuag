@@ -499,6 +499,9 @@ String? extractNameFromId(String rawText) {
     if (mid.any((k) => hasPhrase(u, k))) return 'middle';
     if (giv.any((k) => hasPhrase(u, k))) return 'given';
     if (sur.any((k) => hasPhrase(u, k))) return 'surname';
+    // Mahinang senyales: nag-iisang "NAMES" na lang ang nabasa ng OCR (mula sa
+    // "MGA PANGALAN / GIVEN NAMES") — given pa rin ito.
+    if (containsWord(u, 'NAMES')) return 'given';
     return null;
   }
 
@@ -509,51 +512,60 @@ String? extractNameFromId(String rawText) {
     'INITIAL', 'GITNANG', 'PANGALAN', 'LAST',
   };
 
-  // Halaga na nasa SUSUNOD na linya ng label.
-  String? valueAfter(int labelIndex) {
-    for (var k = labelIndex + 1;
-        k < lines.length && k <= labelIndex + 2;
-        k++) {
+  // Tunay na halaga ng pangalan sa loob ng [labelIndex .. +2] na linya —
+  // tumigil sa unang susunod na label/address line. All-caps na salita lang
+  // (gaya ng naka-print sa ID) na may kabuuang ≥2 vowels ang tinatanggap —
+  // pinipigilan ang OCR garbage (BRAT, SRSA, NER, WL) na maging pangalan,
+  // pero tunay na halaga (PAGLINAWAN, ARNOLD) kahit may kalat na guhit.
+  bool isLabelWord(String w) =>
+      labelWords.any((lw) => containsWord(w.toUpperCase(), lw));
+
+  String? valueForLabelAt(int labelIndex) {
+    var best = '';
+    var bestScore = 0;
+    for (var k = labelIndex; k < lines.length && k <= labelIndex + 2; k++) {
       final up = lines[k].toUpperCase();
-      if (blocklist.hasMatch(up)) return null;
-      if (classifyLabel(up) != null) continue;
-      final cand = clean(lines[k]);
-      // Dapat all-caps (gaya ng naka-print sa ID) ang halaga — hindi ito
-      // makakakuha ng OCR garbage bilang pangalan.
-      if (cand.isNotEmpty &&
-          looksLikeNameValue(cand) &&
-          _isUpperNameLine(lines[k])) {
-        return cand;
+      if (k > labelIndex) {
+        if (classifyLabel(up) != null) break; // susunod na label — tama na
+        if (blocklist.hasMatch(up)) break; // address/header line na
       }
+      var run = <String>[];
+      var runScore = 0;
+      void flush() {
+        if (runScore >= 2 && runScore > bestScore) {
+          best = run.join(' ');
+          bestScore = runScore;
+        }
+        run = <String>[];
+        runScore = 0;
+      }
+
+      for (final t in lines[k].split(RegExp(r'[^A-Za-z0-9]+'))) {
+        if (t.isEmpty) continue;
+        final isDigits = RegExp(r'^[0-9]+$').hasMatch(t);
+        final vowels = t.replaceAll(RegExp(r'[^AEIOUaeiou]'), '').length;
+        final ok = !isDigits &&
+            t == t.toUpperCase() && // all-caps (naka-print sa ID)
+            t.length >= 4 && // hindi maiikling ingay (NER, WL, TL)
+            !isLabelWord(t) &&
+            vowels >= 1;
+        if (ok) {
+          run.add(t);
+          runScore += vowels;
+        } else {
+          flush();
+        }
+      }
+      flush();
     }
-    return null;
+    return best.isEmpty ? null : best;
   }
 
   for (var i = 0; i < lines.length; i++) {
     final u = lines[i].toUpperCase();
     final kind = classifyLabel(u);
     if (kind == null) continue;
-    // Kapag nasa kaparehong linya ang label at halaga, kunin ang lahat ng
-    // salita MULA SA UNANG hindi-label (OCR-tolerant) — doon nagsisimula ang
-    // pangalan ("MGA PANGALAN / GIVEN NAMES GAVIN" -> "GAVIN").
-    final toks = u
-        .split(RegExp(r'[\s/]+'))
-        .map((w) => w.replaceAll(RegExp(r'[^A-Z]'), ''))
-        .where((w) => w.isNotEmpty)
-        .toList();
-    var firstValue = toks.length;
-    for (var t = 0; t < toks.length; t++) {
-      if (!labelWords.any((lw) => containsWord(toks[t], lw))) {
-        firstValue = t;
-        break;
-      }
-    }
-    final sameLine = clean(toks.sublist(firstValue).join(' '));
-    final sameOk = firstValue > 0 &&
-        sameLine.isNotEmpty &&
-        looksLikeNameValue(sameLine) &&
-        sameLine.replaceAll(RegExp(r'[^A-Za-z]'), '').length >= 3;
-    final v = (sameOk ? sameLine : null) ?? valueAfter(i);
+    final v = valueForLabelAt(i);
     if (v == null || v.isEmpty) continue;
     if (kind == 'surname') surname ??= v;
     if (kind == 'given') given ??= v;
@@ -585,7 +597,8 @@ String? extractNameFromId(String rawText) {
     if (comma.length >= 2) {
       final last = clean(comma[0]);
       final rest = clean(comma.sublist(1).join(' '));
-      if (looksLikeNameValue(last, minWords: 2) &&
+      if (_isUpperNameLine(l) &&
+          looksLikeNameValue(last, minWords: 2) &&
           looksLikeNameValue(rest, minWords: 2)) {
         return _titleCaseName('$rest $last');
       }
@@ -1946,7 +1959,15 @@ class _RoleHomeState extends State<RoleHome> {
           ),
         ],
       ),
-      body: mode == 0 ? const PassengerScreen() : const RiderScreen(),
+      // Ang key ay batay sa naka-login na account — kapag nag-login o nag-log
+      // out ang user (mula man sa popup dito o sa loob ng screen), BAGONG State
+      // ang gagawin ng screen kaya awtomatikong mababasa ang bagong session:
+      // passenger login → agad na dashboard, rider login → Rider Dashboard.
+      // (Dating: hindi nagre-reload ang _isLoggedIn/riderName kaya kailangan
+      // pang mag-login ulit bago lumitaw ang dashboard — bug #2.)
+      body: mode == 0
+          ? PassengerScreen(key: ValueKey('passenger-${user?.email ?? 'anon'}'))
+          : RiderScreen(key: ValueKey('rider-${user?.email ?? 'anon'}')),
     );
   }
 }
