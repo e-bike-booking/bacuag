@@ -1,0 +1,1147 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Bike — Official Passenger & Rider Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        emerald: { 600: '#087F5B', 700: '#065F43', 800: '#044E37' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+    <!-- 🛺 E-Bike logo (unikang disenyo) — ginagamit sa buong page -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <symbol id="sakay-bacuag-logo" viewBox="0 0 64 64">
+            <defs>
+                <linearGradient id="sbg1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stop-color="#10b981"/>
+                    <stop offset="1" stop-color="#065f46"/>
+                </linearGradient>
+            </defs>
+            <rect x="1" y="1" width="62" height="62" rx="15" fill="url(#sbg1)"/>
+            <path d="M6 54 Q22 46 32 40 T58 26" stroke="#ffffff" stroke-opacity="0.25" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="6 7"/>
+            <path d="M16 40 L17.5 30 Q18 26.5 21.5 26 L30 24.8 Q35 24.2 37.5 28.6 L41 40 Z" fill="#ffffff"/>
+            <path d="M21.8 28.4 H29.6 Q33 28 34.6 31.2 L36 37 H20.4 Z" fill="#065f46" opacity="0.85"/>
+            <path d="M46 8 L34.5 23.5 H41 L36 36 L47.5 20.5 H41 Z" fill="#facc15"/>
+            <circle cx="20.5" cy="45" r="5.6" fill="#111827"/>
+            <circle cx="20.5" cy="45" r="2.2" fill="#e5e7eb"/>
+            <circle cx="39.5" cy="45" r="5.6" fill="#111827"/>
+            <circle cx="39.5" cy="45" r="2.2" fill="#e5e7eb"/>
+        </symbol>
+    </svg>
+    <!-- Navbar / Header -->
+    <header class="bg-emerald-700 text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div>
+                    <span class="text-2xl font-black tracking-tight">E-Bike</span>
+                    <span class="block text-xs text-emerald-200">Bacuag, Surigao del Norte</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-6 text-sm font-medium">
+                <a href="#features" class="hover:text-emerald-200 transition">Mga Tampok</a>
+                <a href="#app-preview" class="hover:text-emerald-200 transition">App Functions</a>
+                <a href="#signup" class="hover:text-emerald-200 transition">Mag-Sign Up</a>
+                <a href="#about" class="hover:text-emerald-200 transition">Tungkol sa App</a>
+                <button onclick="openAdminPortal()" class="bg-white text-emerald-700 hover:bg-emerald-50 px-4 py-2 rounded-xl font-bold shadow transition flex items-center space-x-2">
+                    <i class="fa-solid fa-lock text-xs"></i>
+                    <span>Admin Portal</span>
+                </button>
+            </nav>
+            <div class="md:hidden flex items-center space-x-2">
+                <a href="#signup" class="bg-emerald-600 px-3 py-1.5 rounded-lg font-bold text-xs">Sign Up</a>
+                <button onclick="openAdminPortal()" class="bg-white text-emerald-700 px-3 py-1.5 rounded-lg font-bold text-xs">Admin</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="relative bg-gradient-to-br from-emerald-800 via-emerald-700 to-teal-900 text-white py-20 px-4 overflow-hidden">
+        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:16px_16px]"></div>
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center relative z-10">
+            <div class="space-y-6 text-center md:text-left">
+                <span class="bg-emerald-600 text-emerald-100 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5">
+                    <i class="fa-solid fa-shield-halved"></i> Opisyal na LGU Transport Platform
+                </span>
+                <h1 class="text-4xl md:text-6xl font-black leading-tight tracking-tight">
+                    Mabilis, Ligtas, at Lokal na <span class="text-emerald-300">E-Bike Booking</span> sa Bacuag.
+                </h1>
+                <p class="text-lg text-emerald-100 font-normal leading-relaxed">
+                    Ang <strong>E-Bike App</strong> ang pinakamabilis na solusyon sa transportasyon para sa mga pasahero at rehistradong e-sikad drivers sa buong Poblacion at munisipalidad ng Bacuag. May kasamang live GPS tracking, real-time street routing, at automated LGU verification.
+                </p>
+                <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4 pt-4 flex-wrap">
+                    <a href="../app-release.apk" download class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-xl shadow-xl transition flex items-center justify-center space-x-3 text-base">
+                        <i class="fa-solid fa-download"></i>
+                        <span>I-download ang App (APK)</span>
+                    </a>
+                    <a href="#signup" class="bg-white text-emerald-800 hover:bg-emerald-50 font-bold px-8 py-4 rounded-xl shadow-xl transition flex items-center justify-center space-x-3 text-base">
+                        <i class="fa-solid fa-user-plus text-emerald-700"></i>
+                        <span>Mag-Sign Up Ngayon</span>
+                    </a>
+                </div>
+            </div>
+            <div class="flex justify-center">
+                <div class="relative w-full max-w-md bg-white/10 backdrop-blur-md p-6 rounded-3xl border border-white/20 shadow-2xl space-y-4">
+                    <div class="flex items-center justify-between text-xs text-emerald-200 border-b border-white/10 pb-3">
+                        <span class="flex items-center gap-1"><i class="fa-solid fa-circle text-green-400 text-[8px]"></i> Live Bacuag Dispatch</span>
+                        <span>Poblacion Center</span>
+                    </div>
+                    <div class="bg-emerald-900/60 p-4 rounded-2xl space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-sm">🛺 E-Bike #BK-10892</span>
+                            <span class="bg-green-500/20 text-green-300 text-xs px-2 py-0.5 rounded">On the way</span>
+                        </div>
+                        <p class="text-xs text-emerald-100">Pasahero: Maria Santos<br>Pickup: Poblacion Bacuag Pin</p>
+                        <div class="w-full bg-emerald-800 h-2 rounded-full overflow-hidden">
+                            <div class="bg-green-400 h-full w-3/4 animate-pulse"></div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 text-center">
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                            <i class="fa-solid fa-route text-emerald-300 mb-1"></i>
+                            <div class="text-xs text-emerald-200">OSRM Road Routing</div>
+                        </div>
+                        <div class="bg-white/5 p-3 rounded-xl border border-white/10">
+                            <i class="fa-solid fa-map-location-dot text-emerald-300 mb-1"></i>
+                            <div class="text-xs text-emerald-200">Strict Bacuag Geofence</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- App Functions & Actual Screen Mockups Preview -->
+    <section id="app-preview" class="py-20 px-4 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+            <span class="text-emerald-700 font-bold text-xs uppercase tracking-wider bg-emerald-100 px-3 py-1 rounded-full">Mobile App Preview</span>
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Mga Function sa Mobile App</h2>
+            <p class="text-gray-600 text-base">Silipin ang mga aktwal na screen at function ng E-Bike app para sa pasahero at driver.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Screen 1 -->
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 flex flex-col group hover:-translate-y-1 transition duration-300">
+                <div class="bg-gray-900 p-4 text-white relative">
+                    <div class="absolute top-2 right-3 text-[10px] text-gray-400">9:41 AM</div>
+                    <div class="text-xs font-bold text-emerald-400 mb-1">1. Passenger Map Pin</div>
+                    <div class="bg-emerald-800 rounded-2xl p-3 h-48 relative flex flex-col justify-between overflow-hidden shadow-inner border border-emerald-700">
+                        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:10px_10px]"></div>
+                        <div class="flex justify-between items-center text-[10px] bg-emerald-900/80 px-2 py-1 rounded-lg z-10">
+                            <span>📍 Poblacion Bacuag</span>
+                            <span class="text-green-300">GPS Active</span>
+                        </div>
+                        <div class="self-center z-10 text-center animate-bounce">
+                            <i class="fa-solid fa-location-pin text-red-500 text-3xl drop-shadow-md"></i>
+                            <div class="bg-white text-gray-900 text-[9px] font-bold px-2 py-0.5 rounded shadow mt-1">Pickup Pin</div>
+                        </div>
+                        <div class="bg-white text-emerald-900 text-[10px] font-bold p-2 rounded-xl text-center shadow z-10">
+                            Mag-request ng E-Bike
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-2 flex-1 flex flex-col justify-between bg-white">
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        I-tap ang mapa o gamitin ang GPS button para ilagay ang iyong pickup at destination pin sa buong Poblacion Bacuag.
+                    </p>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg inline-block text-center">Interactive Map View</span>
+                </div>
+            </div>
+
+            <!-- Screen 2 -->
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 flex flex-col group hover:-translate-y-1 transition duration-300">
+                <div class="bg-gray-900 p-4 text-white relative">
+                    <div class="absolute top-2 right-3 text-[10px] text-gray-400">9:42 AM</div>
+                    <div class="text-xs font-bold text-emerald-400 mb-1">2. Live Rider Tracking</div>
+                    <div class="bg-teal-900 rounded-2xl p-3 h-48 relative flex flex-col justify-between overflow-hidden shadow-inner border border-teal-700">
+                        <div class="absolute inset-0 opacity-20 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:10px_10px]"></div>
+                        <div class="flex justify-between items-center text-[10px] bg-teal-950 px-2 py-1 rounded-lg z-10">
+                            <span>🧭 OSRM Road Routing</span>
+                            <span class="text-blue-300">On the way</span>
+                        </div>
+                        <div class="absolute top-12 left-10 z-10">
+                            <div class="bg-emerald-600 text-white text-[9px] font-bold p-1 rounded-full shadow"><i class="fa-solid fa-rickshaw"></i></div>
+                        </div>
+                        <div class="absolute bottom-12 right-10 z-10">
+                            <i class="fa-solid fa-location-pin text-red-500 text-2xl"></i>
+                        </div>
+                        <svg class="absolute inset-0 w-full h-full stroke-blue-400 stroke-2 fill-none z-0">
+                            <path d="M 45 60 L 45 130 L 160 130" stroke-dasharray="4"/>
+                        </svg>
+                        <div class="bg-white/90 text-teal-950 text-[10px] font-bold p-2 rounded-xl text-center shadow z-10">
+                            Papunta na ang E-Bike sa Pin
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-2 flex-1 flex flex-col justify-between bg-white">
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Makita nang live ang paggalaw ng rider habang sinusundan ang mga kalsada at lansangan patungo sa iyong kinaroroonan.
+                    </p>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg inline-block text-center">Real-time GPS Sync</span>
+                </div>
+            </div>
+
+            <!-- Screen 3 -->
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 flex flex-col group hover:-translate-y-1 transition duration-300">
+                <div class="bg-gray-900 p-4 text-white relative">
+                    <div class="absolute top-2 right-3 text-[10px] text-gray-400">9:43 AM</div>
+                    <div class="text-xs font-bold text-emerald-400 mb-1">3. Zoomable Pickup Photo</div>
+                    <div class="bg-emerald-950 rounded-2xl p-3 h-48 relative flex flex-col justify-between overflow-hidden shadow-inner border border-emerald-800">
+                        <div class="flex justify-between items-center text-[10px] bg-emerald-900 px-2 py-1 rounded-lg z-10">
+                            <span>📷 Landmark Photo</span>
+                            <span class="text-yellow-300">Tap to Zoom</span>
+                        </div>
+                        <div class="bg-emerald-900/90 rounded-xl p-2 text-center relative border border-emerald-700 my-auto">
+                            <i class="fa-solid fa-image text-emerald-400 text-3xl mb-1"></i>
+                            <div class="text-[9px] text-emerald-100 font-medium">Pickup Area Photo.jpg</div>
+                            <div class="absolute top-2 right-2 bg-black/60 text-white p-1 rounded text-[8px]"><i class="fa-solid fa-magnifying-glass-plus"></i></div>
+                        </div>
+                        <div class="bg-white text-emerald-950 text-[10px] font-bold p-2 rounded-xl text-center shadow z-10">
+                            I-zoom para sa Detalye
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-2 flex-1 flex flex-col justify-between bg-white">
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Pwedeng i-click at i-zoom ng rider ang larawan ng pickup area para madaling makilala ang eksaktong lokasyon ng pasahero.
+                    </p>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg inline-block text-center">Interactive Photo Modal</span>
+                </div>
+            </div>
+
+            <!-- Screen 4 -->
+            <div class="bg-white rounded-3xl shadow-lg overflow-hidden border border-gray-100 flex flex-col group hover:-translate-y-1 transition duration-300">
+                <div class="bg-gray-900 p-4 text-white relative">
+                    <div class="absolute top-2 right-3 text-[10px] text-gray-400">9:44 AM</div>
+                    <div class="text-xs font-bold text-emerald-400 mb-1">4. Rider Dashboard & Stats</div>
+                    <div class="bg-teal-950 rounded-2xl p-3 h-48 relative flex flex-col justify-between overflow-hidden shadow-inner border border-teal-800">
+                        <div class="flex justify-between items-center text-[10px] bg-teal-900 px-2 py-1 rounded-lg">
+                            <span>🛺 Kuya Juan</span>
+                            <span class="bg-green-500 text-white text-[8px] px-1.5 py-0.5 rounded font-bold">ONLINE</span>
+                        </div>
+                        <div class="bg-teal-900/80 p-2.5 rounded-xl text-center border border-teal-700">
+                            <span class="text-[9px] text-gray-300 uppercase block font-bold">Total Pickups</span>
+                            <span class="text-xl font-black text-green-400">18 Biyahe</span>
+                        </div>
+                        <div class="bg-white text-teal-950 text-[10px] font-bold p-2 rounded-xl text-center shadow">
+                            Single-Active Booking Rule Active
+                        </div>
+                    </div>
+                </div>
+                <div class="p-5 space-y-2 flex-1 flex flex-col justify-between bg-white">
+                    <p class="text-xs text-gray-600 leading-relaxed">
+                        Dashboard na may kabuuang bilang ng mga natapos na pickup, kasaysayan ng biyahe, at single-active-booking exclusivity rule.
+                    </p>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg inline-block text-center">Trip History & Stats</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sign Up Section -->
+    <section id="signup" class="bg-emerald-900 text-white py-20 px-4 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:20px_20px]"></div>
+        <div class="max-w-4xl mx-auto relative z-10 bg-white/10 backdrop-blur-md p-8 md:p-12 rounded-3xl border border-white/20 shadow-2xl">
+            <div class="text-center max-w-xl mx-auto space-y-3 mb-8">
+                <span class="bg-emerald-600 text-emerald-100 text-xs px-3 py-1 rounded-full font-bold">Magrehistro Ngayon</span>
+                <h2 class="text-3xl font-black">Sumali sa E-Bike</h2>
+                <p class="text-sm text-emerald-100">Mag-sign up bilang Pasahero o mag-apply bilang Rehistradong E-Bike Rider sa Bacuag.</p>
+            </div>
+            <form onsubmit="handleSignup(event)" class="space-y-4 max-w-lg mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase mb-1">Buong Pangalan</label>
+                        <input type="text" id="su-name" required class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="Juan Dela Cruz">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase mb-1">Contact Number</label>
+                        <input type="tel" id="su-phone" required class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="09123456789">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Pumili ng Uri ng Account</label>
+                    <select id="su-role" class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                        <option value="passenger">Pasahero (Passenger)</option>
+                        <option value="rider">E-Bike Rider (Need LGU Approval)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Email Address</label>
+                    <input type="email" id="su-email" required class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="juan@gmail.com">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Password (6+ character)</label>
+                    <input type="password" id="su-pass" required minlength="6" class="w-full px-4 py-2.5 rounded-xl bg-white/90 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Verified ID (Litrato ng Valid ID)</label>
+                    <input type="file" id="su-id" accept="image/*" required class="w-full px-4 py-2 rounded-xl bg-white/90 text-gray-900 text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white file:font-bold file:text-xs">
+                    <p class="text-[11px] text-emerald-100 mt-1">Kunan o piliin ang malinaw na larawan ng iyong Valid ID (Bacuag resident) — ito ang beripikasyon bago ka tuluyang ma-activate.</p>
+                    <img id="su-id-preview" class="hidden mt-3 h-24 rounded-xl border-2 border-emerald-400/60 object-cover" alt="Verified ID preview">
+                </div>
+                <button type="submit" class="w-full bg-white text-emerald-900 hover:bg-emerald-50 font-extrabold py-3.5 rounded-xl shadow-lg transition text-sm">
+                    Mag-register sa E-Bike
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-4 max-w-7xl mx-auto">
+        <div class="text-center max-w-3xl mx-auto space-y-4 mb-16">
+            <h2 class="text-3xl md:text-4xl font-extrabold text-gray-900">Bakit E-Bike?</h2>
+            <p class="text-gray-600 text-base">Idinisenyo para sa komunidad ng Bacuag na may kumpletong modernong transport features para sa pasahero at driver.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <!-- Feature 1 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-100 space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-xl">
+                    <i class="fa-solid fa-map-pin"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Map Pin & Fare Estimate</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">I-tap ang eksaktong lokasyon o gamitin ang GPS para sa pickup at destination pin na may automated fare calculation.</p>
+            </div>
+            <!-- Feature 2 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-100 space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-xl">
+                    <i class="fa-solid fa-location-arrow"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Live OSRM Road Routing</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">Real-time street-level tracking na sumusunod sa mga kalsada at lansangan ng Poblacion Bacuag patungo sa pin.</p>
+            </div>
+            <!-- Feature 3 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-100 space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-xl">
+                    <i class="fa-solid fa-camera-retro"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Zoomable Pickup Photo</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">Kumuha at mag-upload ng larawan ng pickup area na pwedeng i-zoom ng rider para madaling makilala ang lokasyon.</p>
+            </div>
+            <!-- Feature 4 -->
+            <div class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-100 space-y-4">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-700 rounded-xl flex items-center justify-center font-bold text-xl">
+                    <i class="fa-solid fa-user-check"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Verified Riders Only</h3>
+                <p class="text-sm text-gray-600 leading-relaxed">Ligtas ang biyahe dahil ang mga rider lamang na aprubado ng LGU Dispatcher ang pwedeng umaktibo online.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download / About Section -->
+    <section id="about" class="bg-white py-20 px-4 border-y border-gray-100">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div class="space-y-6">
+                <span class="text-emerald-700 font-bold text-sm tracking-wider uppercase">Lokal na Inobasyon</span>
+                <h2 class="text-3xl font-black text-gray-900">Pamamahala ng E-Bike sa Bacuag</h2>
+                <p class="text-gray-600 leading-relaxed">
+                    Ang **E-Bike** ay binuo upang i-streamline ang operasyon ng mga e-sikad sa munisipalidad. Sa pamamagitan ng app na ito, maiiwasan ang siksikan, masisiguro ang tamang pamasahe, at mabibigyan ng proteksyon ang mga pasahero at driver sa bawat biyahe sa loob ng Bacuag service area.
+                </p>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 text-emerald-700 font-semibold text-sm">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>Strict Municipal Boundary</span>
+                    </div>
+                    <div class="flex items-center space-x-2 text-emerald-700 font-semibold text-sm">
+                        <i class="fa-solid fa-check-circle"></i>
+                        <span>Single Active Booking Rule</span>
+                    </div>
+                </div>
+            </div>
+            <div id="download" class="bg-emerald-50 p-8 rounded-3xl border border-emerald-100 text-center space-y-6">
+                <div class="w-16 h-16 bg-emerald-600 text-white rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-md">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900">I-download ang E-Bike APK</h3>
+                <p class="text-sm text-gray-600">I-download ang Android app installation package para sa pasahero at rider.</p>
+                <div class="flex justify-center gap-4">
+                    <button onclick="downloadApk()" class="bg-emerald-700 hover:bg-emerald-800 text-white font-bold px-8 py-4 rounded-xl shadow-lg transition text-sm flex items-center space-x-2">
+                        <i class="fa-solid fa-download text-lg"></i>
+                        <span>I-download ang APK v0.1.0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Admin Portal Modal / Section Wrapper -->
+    <div id="admin-portal-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden max-h-[90vh] flex flex-col relative animate-fadeIn">
+            <!-- Modal Header -->
+            <div class="bg-emerald-700 text-white px-6 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fa-solid fa-shield-halved text-xl"></i>
+                    <span class="font-bold text-lg">E-Bike Admin & Dispatcher Portal</span>
+                </div>
+                <button onclick="closeAdminPortal()" class="text-white hover:bg-emerald-800 p-2 rounded-full transition">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content (Admin App) -->
+            <div class="p-6 overflow-y-auto bg-gray-50 flex-1">
+                <!-- Login Screen -->
+                <div id="auth-section" class="max-w-md mx-auto bg-white rounded-2xl shadow-md p-8 my-6 border border-gray-100">
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-black text-gray-900">Admin Sign In</h2>
+                        <p class="text-xs text-gray-500">Mag-login para aprubahan ang mga rider at i-monitor ang bookings</p>
+                    </div>
+                    <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Admin Email</label>
+                            <input type="text" id="email" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-600 focus:outline-none text-sm" placeholder="admin@bacuag.gov.ph">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Password</label>
+                            <input type="password" id="password" required class="w-full px-4 py-2.5 border rounded-xl focus:ring-2 focus:ring-emerald-600 focus:outline-none text-sm" placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-3 rounded-xl shadow transition text-sm">Mag-login sa Dashboard</button>
+                    </form>
+                </div>
+
+                <!-- Dashboard View (Hidden initially) -->
+                <div id="dashboard-section" class="hidden space-y-6">
+                    <div class="flex justify-between items-center bg-white p-4 rounded-2xl shadow-sm border">
+                        <div>
+                            <span class="text-xs text-gray-500 block">Naka-login bilang:</span>
+                            <span id="admin-name" class="font-bold text-emerald-700 text-sm"></span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="openChangePasswordModal()" class="text-xs bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-3 py-1.5 rounded-lg font-bold transition">Palitan ang Password</button>
+                            <button onclick="logout()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition">Mag-logout</button>
+                        </div>
+                    </div>
+
+                    <!-- Logo Management INSIDE Admin Portal Dashboard -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase block">Logo Management</span>
+                            <span class="text-xs text-gray-600">Mag-upload ng bagong logo para sa app at website</span>
+                        </div>
+                        <div>
+                            <input type="file" id="logo-file-input" accept="image/*" onchange="changeLogo(event)" class="hidden">
+                            <button onclick="document.getElementById('logo-file-input').click()" class="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                <i class="fa-solid fa-upload mr-1"></i> Palitan ang Logo
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Account Management (sync ng rider/passenger accounts + reset) -->
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border flex justify-between items-center">
+                        <div>
+                            <span class="text-xs font-bold text-gray-500 uppercase block">Account Management</span>
+                            <span class="text-xs text-gray-600">Sync ng rider/passenger accounts — i-reset lahat para sa normal na paggamit</span>
+                        </div>
+                        <button onclick="resetAllAccounts()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-1.5 rounded-lg text-xs font-bold transition shrink-0">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Reset lahat ng accounts
+                        </button>
+                    </div>
+
+                    <!-- Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Total Bookings</span>
+                            <p class="text-3xl font-black text-emerald-700 mt-1" id="stat-bookings-count">0</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Pending Riders</span>
+                            <p class="text-3xl font-black text-orange-600 mt-1" id="stat-riders-count">0</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Active on Road</span>
+                            <p class="text-3xl font-black text-blue-600 mt-1" id="stat-active-count">0</p>
+                        </div>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="flex border-b border-gray-200 overflow-x-auto">
+                        <button onclick="switchTab('riders')" id="tab-riders-btn" class="py-2 px-4 font-bold text-emerald-700 border-b-2 border-emerald-700 text-sm focus:outline-none whitespace-nowrap">Rider Approvals</button>
+                        <button onclick="switchTab('passengers')" id="tab-passengers-btn" class="py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap">Registered Passengers</button>
+                        <button onclick="switchTab('bookings')" id="tab-bookings-btn" class="py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap">Live Bookings</button>
+                        <button onclick="switchTab('boundary')" id="tab-boundary-btn" class="py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap">Boundary Status</button>
+                    </div>
+
+                    <!-- Tab 1: Riders -->
+                    <div id="tab-riders" class="bg-white rounded-2xl shadow-sm overflow-hidden border">
+                        <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 text-sm">Rider Registrations (Pending & Approved)</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">Rider Name</th>
+                                        <th class="px-6 py-3">Contact</th>
+                                        <th class="px-6 py-3">Email</th>
+                                        <th class="px-6 py-3">Verified ID</th>
+                                        <th class="px-6 py-3">Status</th>
+                                        <th class="px-6 py-3 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="riders-table-body" class="divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 2: Passengers -->
+                    <div id="tab-passengers" class="hidden bg-white rounded-2xl shadow-sm overflow-hidden border">
+                        <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 text-sm">Registered Passengers</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">Passenger Name</th>
+                                        <th class="px-6 py-3">Contact</th>
+                                        <th class="px-6 py-3">Email</th>
+                                        <th class="px-6 py-3">Verified ID</th>
+                                        <th class="px-6 py-3">Date Registered</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="passengers-table-body" class="divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 3: Bookings -->
+                    <div id="tab-bookings" class="hidden bg-white rounded-2xl shadow-sm overflow-hidden border">
+                        <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 text-sm">Active Bacuag Bookings</span>
+                            <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded-full font-bold">Live</span>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                    <tr>
+                                        <th class="px-6 py-3">ID</th>
+                                        <th class="px-6 py-3">Passenger</th>
+                                        <th class="px-6 py-3">Pickup</th>
+                                        <th class="px-6 py-3">Rider</th>
+                                        <th class="px-6 py-3">Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookings-table-body" class="divide-y divide-gray-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Tab 4: Boundary -->
+                    <div id="tab-boundary" class="hidden bg-white rounded-2xl shadow-sm p-6 border space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="font-bold text-gray-900">Bacuag Municipal Boundary & Geofence</h3>
+                            <span id="boundary-status-badge" class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-bold">ACTIVE</span>
+                        </div>
+                        <p class="text-sm text-gray-600">Opisyal na serbisyo-sakop na naka-encode sa app
+                            (<code class="bg-gray-100 px-2 py-1 rounded text-xs">bacuagBounds</code>). Ang Boyongan, Pananay-an,
+                            Campo at Cabugao ay <strong>wala</strong> sa loob nito — hindi na makikita sa mapa at tinatanggihan ng geofence.
+                        </p>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm">
+                                <thead class="bg-gray-50 text-gray-500 text-xs uppercase">
+                                    <tr>
+                                        <th class="px-4 py-2">#</th>
+                                        <th class="px-4 py-2">Latitude</th>
+                                        <th class="px-4 py-2">Longitude</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="boundary-table-body" class="divide-y divide-gray-100"></tbody>
+                            </table>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-gray-50 p-3 rounded-xl">
+                                <span class="text-gray-500 text-xs block">Coverage (Hilaga–Timog)</span>
+                                <span id="boundary-span-lat" class="font-bold text-emerald-700">—</span>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-xl">
+                                <span class="text-gray-500 text-xs block">Coverage (Kanluran–Silangan)</span>
+                                <span id="boundary-span-lng" class="font-bold text-emerald-700">—</span>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-xl">
+                                <span class="text-gray-500 text-xs block">Nasa loob ng sakop</span>
+                                <span id="boundary-inside-count" class="font-bold text-emerald-700">—</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">Service Area ID: <code class="bg-gray-100 px-2 py-1 rounded text-xs">bacuag</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="change-pass-modal" class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full space-y-4 shadow-xl">
+            <h3 class="font-bold text-gray-900 text-lg">Palitan ang Admin Password</h3>
+            <form onsubmit="handleChangePassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase">Lumang Password</label>
+                    <input type="password" id="old-pass" required class="w-full px-3 py-2 border rounded-xl text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase">Bagong Password</label>
+                    <input type="password" id="new-pass" required class="w-full px-3 py-2 border rounded-xl text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="••••••••">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase">Kumpirmahin ang Bagong Password</label>
+                    <input type="password" id="confirm-pass" required class="w-full px-3 py-2 border rounded-xl text-sm mt-1 focus:outline-none focus:ring-2 focus:ring-emerald-600" placeholder="••••••••">
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeChangePasswordModal()" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold">Kanselahin</button>
+                    <button type="submit" class="px-4 py-2 bg-emerald-700 text-white rounded-xl text-xs font-bold">I-save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 px-4 text-center">
+        <div class="max-w-7xl mx-auto space-y-4">
+            <div class="inline-flex items-center justify-center gap-4 text-white">
+                <span id="brand-logo-container" class="bg-white p-1.5 rounded-3xl shadow-xl border-2 border-white/60 inline-flex items-center justify-center">
+                    <svg id="brand-logo-svg" class="w-28 h-28 block"><use href="#sakay-bacuag-logo"/></svg>
+                    <img id="brand-logo-img" src="" alt="Logo" class="w-28 h-28 object-cover rounded-2xl hidden">
+                </span>
+                <span class="text-4xl font-black tracking-tight">E-Bike</span>
+            </div>
+            <p class="text-xs text-gray-500">Opisyal na E-Bike Passenger, Rider, at LGU Admin Portal. Borne for Bacuag, Surigao del Norte.</p>
+            <p class="text-xs text-gray-600">&copy; 2025 E-Bike. All rights reserved. Hosted via GitHub Pages.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript & LocalStorage Sync Logic -->
+    <script>
+        // 🧪 Demo accounts — pareho ng naka-seed sa mobile app
+        // (AccountStore._seedDemoAccounts sa lib/main.dart) para magkatugma
+        // ang credentials sa app at sa admin portal.
+        const DEMO_ACCOUNTS = [
+            { name: 'Rider Demo', phone: '09912345678', email: 'rider@sakaybacuag.ph', role: 'rider', status: 'approved', date: new Date().toISOString().split('T')[0] },
+            { name: 'Pasahero Demo', phone: '09987654321', email: 'passenger@sakaybacuag.ph', role: 'passenger', status: 'approved', date: new Date().toISOString().split('T')[0] }
+        ];
+
+        // ---------------------------------------------------------------------------
+        // SYNC SA APP — ang Flutter web app ay nagse-save sa parehong browser
+        // localStorage gamit ang shared_preferences, na nagdadagdag ng "flutter."
+        // prefix sa key. Dati ay magkaibang key ang gamit ng admin
+        // (sakay_bacuag_users) kaya HINDI kailanman nag-sync — kaya 0/0/0 ang
+        // dashboard at may mga hardcoded na row. Ngayon: iisang pinagmumulan.
+        // ---------------------------------------------------------------------------
+        const ADMIN_EMAIL_DEFAULT = 'admin@bacuag.gov.ph';
+        const ADMIN_PASSWORD_DEFAULT = 'adminbacuag2026';
+        const ADMIN_EMAIL_KEY = 'sakay_admin_email_v1';
+        const ADMIN_PASS_KEY = 'sakay_admin_password_v1';
+        const RIDER_STATUS_KEY = 'sakay_admin_rider_status_v1';
+        const ACTIVE_BOOKING_STATUSES = ['accepted', 'on_the_way', 'arrived'];
+
+        /** Basahin ang JSON mula sa localStorage — sinusubukan ang app key at ang
+         *  `flutter.`-prefix na variant ng shared_preferences. */
+        function readJSON(key) {
+            try {
+                const raw = localStorage.getItem(key) ?? localStorage.getItem('flutter.' + key);
+                if (raw == null) return null;
+                let value = JSON.parse(raw);
+                // ⚠️ Ang shared_preferences ng Flutter web ay nag-iimbak ng string
+                // value bilang JSON-encoded string (kaya double-encoded ang laman:
+                // '"[{...}]"'). Isang JSON.parse ay string pa rin ang bibigay —
+                // kailangan unwrap hanggang tunay na object/array, kung hindi ay
+                // laging 0 bookings at walang makikitang account mula sa app.
+                let guard = 0;
+                while (typeof value === 'string' && guard++ < 4) {
+                    value = JSON.parse(value);
+                }
+                return value;
+            } catch (_) { return null; }
+        }
+
+        function setText(id, value) {
+            const el = document.getElementById(id);
+            if (el) el.innerText = value;
+        }
+
+        function escapeHtml(value) {
+            return String(value == null ? '' : value).replace(/[&<>"']/g, c =>
+                ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        }
+
+        /** Lahat ng account ng app, pinagsama sa lumang admin store (walang mawawala). */
+        function getAppAccounts() {
+            const appAccounts = readJSON('sakay_accounts_v1');
+            let legacy = [];
+            try { legacy = JSON.parse(localStorage.getItem('sakay_bacuag_users') || '[]'); } catch (_) {}
+            const byEmail = new Map();
+            for (const u of (Array.isArray(legacy) ? legacy : [])) if (u && u.email) byEmail.set(u.email, u);
+            for (const u of (Array.isArray(appAccounts) ? appAccounts : [])) {
+                if (u && u.email) byEmail.set(u.email, Object.assign(byEmail.get(u.email) || {}, u));
+            }
+            return [...byEmail.values()];
+        }
+
+        /** Lahat ng booking ng app (sakay_bookings_v1) — ito ang totoong data. */
+        function getAppBookings() {
+            const b = readJSON('sakay_bookings_v1');
+            return Array.isArray(b) ? b : [];
+        }
+
+        /** Opisyal na 5 hangganan ng serbisyo-sakop (kapareho ng bacuagBounds). */
+        const SERVICE_AREA = [
+            [9.602836630516139, 125.64657650941132],
+            [9.599719327719372, 125.64461871475464],
+            [9.605450258590752, 125.63615421842985],
+            [9.60949587481933, 125.63426418140286],
+            [9.623381167347054, 125.62649076846351]
+        ];
+
+        function seedDemoAccounts() {
+            // Idinagdag lang ang mga demo na wala pa sa store — hindi tinatanggal
+            // ang mga totoong rehistradong account.
+            let users = JSON.parse(localStorage.getItem('sakay_bacuag_users') || '[]');
+            let changed = false;
+            for (const demo of DEMO_ACCOUNTS) {
+                if (!users.some(u => u.email === demo.email)) {
+                    users.push(demo);
+                    changed = true;
+                }
+            }
+            if (changed) localStorage.setItem('sakay_bacuag_users', JSON.stringify(users));
+        }
+
+        function resetAllAccounts() {
+            const ok = confirm('I-reset ang LAHAT ng accounts (riders at passengers)? Mawawala ang mga nakarehistrong user at ang demo rider/passenger ang muling ise-seed para sa normal na paggamit.');
+            if (!ok) return;
+            localStorage.removeItem('sakay_bacuag_users');
+            seedDemoAccounts();
+            loadAdminUsers();
+            alert('✅ Na-reset ang lahat ng accounts. Ang bagong naka-seed: Rider Demo (rider@sakaybacuag.ph) at Pasahero Demo (passenger@sakaybacuag.ph).');
+        }
+
+        function openAdminPortal() {
+            document.getElementById('admin-portal-modal').classList.remove('hidden');
+            seedDemoAccounts();
+            refreshDashboard();
+        }
+
+        function closeAdminPortal() {
+            document.getElementById('admin-portal-modal').classList.add('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('password').value;
+            const expectedEmail = localStorage.getItem(ADMIN_EMAIL_KEY) || ADMIN_EMAIL_DEFAULT;
+            const expectedPass = localStorage.getItem(ADMIN_PASS_KEY) || ADMIN_PASSWORD_DEFAULT;
+            // Tunay na pagsubok — dati ay kahit ano ay pumapasok.
+            if (email.toLowerCase() !== expectedEmail.toLowerCase() || pass !== expectedPass) {
+                alert('Maling email o password.\nOpisyal na account: ' + expectedEmail);
+                document.getElementById('password').value = '';
+                return;
+            }
+            try { localStorage.setItem('sakay_admin_session_v1', email); } catch (_) {}
+            document.getElementById('admin-name').innerText = email;
+            document.getElementById('auth-section').classList.add('hidden');
+            document.getElementById('dashboard-section').classList.remove('hidden');
+            refreshDashboard();
+        }
+
+        function logout() {
+            try { localStorage.removeItem('sakay_admin_session_v1'); } catch (_) {}
+            document.getElementById('auth-section').classList.remove('hidden');
+            document.getElementById('dashboard-section').classList.add('hidden');
+            document.getElementById('login-form').reset();
+        }
+
+        function openChangePasswordModal() {
+            document.getElementById('change-pass-modal').classList.remove('hidden');
+        }
+
+        function closeChangePasswordModal() {
+            document.getElementById('change-pass-modal').classList.add('hidden');
+        }
+
+        function handleChangePassword(event) {
+            event.preventDefault();
+            const oldPass = document.getElementById('old-pass').value;
+            const newPass = document.getElementById('new-pass').value;
+            const confirmPass = document.getElementById('confirm-pass').value;
+            const expectedPass = localStorage.getItem(ADMIN_PASS_KEY) || ADMIN_PASSWORD_DEFAULT;
+            if (oldPass !== expectedPass) {
+                alert('Mali ang lumang password.');
+                return;
+            }
+            if (newPass !== confirmPass) {
+                alert('Hindi magkatugma ang bagong password at kumpirmasyon.');
+                return;
+            }
+            if (newPass.length < 6) {
+                alert('Dapat may 6 o higit pang character ang bagong password.');
+                return;
+            }
+            try { localStorage.setItem(ADMIN_PASS_KEY, newPass); } catch (_) {}
+            alert('✅ Tagumpay na napalitan ang iyong admin password!');
+            closeChangePasswordModal();
+            ['old-pass', 'new-pass', 'confirm-pass'].forEach(id => {
+                document.getElementById(id).value = '';
+            });
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-riders').classList.add('hidden');
+            document.getElementById('tab-passengers').classList.add('hidden');
+            document.getElementById('tab-bookings').classList.add('hidden');
+            document.getElementById('tab-boundary').classList.add('hidden');
+
+            document.getElementById('tab-riders-btn').className = "py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap";
+            document.getElementById('tab-passengers-btn').className = "py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap";
+            document.getElementById('tab-bookings-btn').className = "py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap";
+            document.getElementById('tab-boundary-btn').className = "py-2 px-4 font-bold text-gray-400 hover:text-gray-600 text-sm focus:outline-none whitespace-nowrap";
+
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            document.getElementById('tab-' + tab + '-btn').className = "py-2 px-4 font-bold text-emerald-700 border-b-2 border-emerald-700 text-sm focus:outline-none whitespace-nowrap";
+        }
+
+        // 💾 I-downscale ang uploaded na Verified ID bago i-save sa localStorage
+        // (max 700px, JPEG) — para hindi maubos ang ~5MB na limit ng storage.
+        function downscaleImage(file, maxSide = 700, quality = 0.65) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onerror = () => reject(new Error('hindi mabasa ang file'));
+                reader.onload = () => {
+                    const img = new Image();
+                    img.onerror = () => reject(new Error('hindi litrato ang napiling file'));
+                    img.onload = () => {
+                        let w = img.width, h = img.height;
+                        const scale = Math.min(1, maxSide / Math.max(w, h));
+                        w = Math.round(w * scale); h = Math.round(h * scale);
+                        const canvas = document.createElement('canvas');
+                        canvas.width = w; canvas.height = h;
+                        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                        resolve(canvas.toDataURL('image/jpeg', quality));
+                    };
+                    img.src = reader.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // Preview ng Verified ID habang pinipili pa lang.
+        const suIdInput = document.getElementById('su-id');
+        if (suIdInput) {
+            suIdInput.addEventListener('change', () => {
+                const preview = document.getElementById('su-id-preview');
+                const file = suIdInput.files[0];
+                if (!preview) return;
+                if (!file) { preview.classList.add('hidden'); return; }
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('hidden');
+            });
+        }
+
+        async function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('su-name').value.trim();
+            const phone = document.getElementById('su-phone').value.trim();
+            const role = document.getElementById('su-role').value;
+            const email = document.getElementById('su-email').value.trim().toLowerCase();
+            const password = document.getElementById('su-pass').value;
+            const idFile = document.getElementById('su-id').files[0];
+
+            if (password.length < 6) {
+                alert('Dapat may 6 o higit pang character ang password.');
+                return;
+            }
+            if (!idFile) {
+                alert('Kailangan ang Verified ID — pumili ng litrato ng iyong Valid ID.');
+                return;
+            }
+
+            seedDemoAccounts();
+
+            let users = JSON.parse(localStorage.getItem('sakay_bacuag_users') || '[]');
+            if (users.some(u => (u.email || '').toLowerCase() === email)) {
+                alert('May rehistrado nang email na ito. Mag-log in na lang o gumamit ng ibang email.');
+                return;
+            }
+
+            let idPhoto = null;
+            try {
+                idPhoto = await downscaleImage(idFile);
+            } catch (e) {
+                alert('Hindi ma-process ang Verified ID (' + e.message + '). Subukan ang ibang litrato.');
+                return;
+            }
+
+            // Pasahero = kaagad na approved (pwedeng mag-log in agad);
+            // Rider = PENDING hangga't hindi ina-approve ng LGU sa dashboard.
+            const status = role === 'rider' ? 'pending' : 'approved';
+            users.push({ name, phone, role, email, password, status, idPhoto, date: new Date().toISOString().split('T')[0] });
+            try {
+                localStorage.setItem('sakay_bacuag_users', JSON.stringify(users));
+            } catch (e) {
+                alert('Naubusan ng storage ang browser — paliitin ang laki ng litrato ng ID at ulitin.');
+                return;
+            }
+
+            // 🔄 I-sync din sa app account store (flutter.sakay_accounts_v1) para
+            // magamit kaagad ang account sa pag-log in sa mobile/web app at makita
+            // sa dashboard (iisang browser lang ang sync na ito).
+            try {
+                const appRaw = localStorage.getItem('flutter.sakay_accounts_v1');
+                let appAccounts = [];
+                if (appRaw) {
+                    let v = JSON.parse(appRaw);
+                    let guard = 0;
+                    while (typeof v === 'string' && guard++ < 4) v = JSON.parse(v);
+                    if (Array.isArray(v)) appAccounts = v;
+                }
+                if (!appAccounts.some(a => (a.email || '').toLowerCase() === email)) {
+                    appAccounts.push({ name, phone, email, password, role, idType: 'National ID' });
+                    localStorage.setItem('flutter.sakay_accounts_v1', JSON.stringify(JSON.stringify(appAccounts)));
+                }
+            } catch (_) {
+                // Pinakamainam: nasa admin store pa rin ang rehistrasyon.
+            }
+
+            alert('Maraming salamat, ' + name + '!\n' + (role === 'rider'
+                ? 'Naisumite ang iyong Rider application — lumalabas na ito sa dashboard (Rider Approvals), maghintay ng LGU approval.'
+                : 'Approved na ang iyong Pasahero account — pwede ka nang mag-log in sa app gamit ang iyong email at password.'));
+            event.target.reset();
+            const preview = document.getElementById('su-id-preview');
+            if (preview) preview.classList.add('hidden');
+            loadAdminUsers();
+        }
+
+        function riderStatusOf(user) {
+            let overlay = {};
+            try { overlay = JSON.parse(localStorage.getItem(RIDER_STATUS_KEY) || '{}'); } catch (_) {}
+            if (overlay[user.email]) return overlay[user.email];
+            return user.status || 'pending';
+        }
+
+        function loadAdminUsers() {
+            const users = getAppAccounts();
+            const riders = users.filter(u => u.role === 'rider');
+            const passengers = users.filter(u => u.role === 'passenger');
+
+            // — Rider Registrations (Pending & Approved): totoong data ng app,
+            //   walang hardcoded na mock row (dating: Juan Dela Cruz / Pedro Penduko).
+            const ridersBody = document.getElementById('riders-table-body');
+            if (ridersBody) {
+                ridersBody.innerHTML = riders.length === 0
+                    ? '<tr><td colspan="6" class="px-6 py-6 text-center text-gray-400 text-sm">Wala pang rehistradong rider — lumalabas dito ang mga naka-sign up sa app.</td></tr>'
+                    : riders.map(r => {
+                        const st = riderStatusOf(r);
+                        const tone = st === 'approved' ? 'green' : (st === 'rejected' ? 'red' : 'yellow');
+                        const idCell = r.idPhoto
+                            ? `<td class="px-6 py-4"><img src="${r.idPhoto}" alt="Verified ID" title="I-click para makita ang buong ID" onclick="window.open(this.src)" class="w-10 h-10 object-cover rounded-lg border cursor-pointer hover:scale-125 transition"></td>`
+                            : `<td class="px-6 py-4 text-gray-400 text-xs">Walang upload</td>`;
+                        return `
+                    <tr>
+                        <td class="px-6 py-4 font-bold">${escapeHtml(r.name)}</td>
+                        <td class="px-6 py-4 text-gray-600">${escapeHtml(r.phone || '—')}</td>
+                        <td class="px-6 py-4 text-gray-600">${escapeHtml(r.email)}</td>
+                        ${idCell}
+                        <td class="px-6 py-4"><span class="bg-${tone}-100 text-${tone}-800 text-xs px-2 py-0.5 rounded font-bold">${st.toUpperCase()}</span></td>
+                        <td class="px-6 py-4 text-right space-x-2">
+                            <button data-email="${escapeHtml(r.email)}" onclick="updateRiderStatus(this.dataset.email, 'approved')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Approve</button>
+                            <button data-email="${escapeHtml(r.email)}" onclick="updateRiderStatus(this.dataset.email, 'rejected')" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-xs font-bold">Reject</button>
+                        </td>
+                    </tr>
+                `;
+                    }).join('');
+            }
+
+            // — Registered Passengers: totoong data, walang mock row.
+            const passengersBody = document.getElementById('passengers-table-body');
+            if (passengersBody) {
+                passengersBody.innerHTML = passengers.length === 0
+                    ? '<tr><td colspan="5" class="px-6 py-6 text-center text-gray-400 text-sm">Wala pang rehistradong pasahero.</td></tr>'
+                    : passengers.map(p => `
+                    <tr>
+                        <td class="px-6 py-4 font-bold">${escapeHtml(p.name)}</td>
+                        <td class="px-6 py-4 text-gray-600">${escapeHtml(p.phone || '—')}</td>
+                        <td class="px-6 py-4 text-gray-600">${escapeHtml(p.email)}</td>
+                        <td class="px-6 py-4">${p.idPhoto
+                            ? `<img src="${p.idPhoto}" alt="Verified ID" title="I-click para makita ang buong ID" onclick="window.open(this.src)" class="w-10 h-10 object-cover rounded-lg border cursor-pointer hover:scale-125 transition">`
+                            : '<span class="text-gray-400 text-xs">Walang upload</span>'}</td>
+                        <td class="px-6 py-4 text-gray-500">${escapeHtml(p.date || '—')}</td>
+                    </tr>
+                `).join('');
+            }
+
+            // — Pending Riders stat mula sa totoong data (dating hardcoded na 3).
+            setText('stat-riders-count', riders.filter(r => riderStatusOf(r) === 'pending').length);
+        }
+
+        // — Live Bookings: ang totoong bookings ng app (sakay_bookings_v1), na
+        //   ngayon ay pino-persist na ng BookingStore kaya nakikita rito.
+        function loadBookings() {
+            const bookings = getAppBookings();
+            const body = document.getElementById('bookings-table-body');
+            if (body) {
+                body.innerHTML = bookings.length === 0
+                    ? '<tr><td colspan="5" class="px-6 py-6 text-center text-gray-400 text-sm">Wala pang booking — lumalabas dito ang totoong biyahe mula sa app.</td></tr>'
+                    : bookings.map(b => {
+                        const st = String(b.status || 'pending');
+                        const tone = st === 'completed' ? 'green'
+                            : st === 'cancelled' ? 'red'
+                                : st === 'pending' ? 'yellow' : 'blue';
+                        const pu = Array.isArray(b.pickup) && b.pickup.length >= 2
+                            ? `${Number(b.pickup[0]).toFixed(4)}, ${Number(b.pickup[1]).toFixed(4)}`
+                            : '—';
+                        let created = '—';
+                        if (b.createdAt) {
+                            const d = new Date(b.createdAt);
+                            if (!isNaN(d)) created = d.toLocaleString();
+                        }
+                        return `
+                    <tr>
+                        <td class="px-6 py-4 font-bold text-emerald-700">${escapeHtml(b.id)}</td>
+                        <td class="px-6 py-4">${escapeHtml(b.name)}<div class="text-xs text-gray-400">${escapeHtml(created)}</div></td>
+                        <td class="px-6 py-4 text-gray-600">${escapeHtml(pu)}</td>
+                        <td class="px-6 py-4">${escapeHtml(b.riderName || '—')}</td>
+                        <td class="px-6 py-4"><span class="bg-${tone}-100 text-${tone}-800 px-2 py-0.5 rounded text-xs font-bold">${escapeHtml(st)}</span></td>
+                    </tr>
+                `;
+                    }).join('');
+            }
+            setText('stat-bookings-count', bookings.length);
+            setText('stat-active-count',
+                bookings.filter(b => ACTIVE_BOOKING_STATUSES.includes(b.status)).length);
+            return bookings;
+        }
+
+        // — Boundary Status: ang opisyal na 5 hangganan, kapareho ng bacuagBounds.
+        function renderBoundary() {
+            const body = document.getElementById('boundary-table-body');
+            if (body) {
+                body.innerHTML = SERVICE_AREA.map((p, i) => `
+                    <tr>
+                        <td class="px-4 py-2 font-bold">${i + 1}</td>
+                        <td class="px-4 py-2 text-gray-600">${p[0].toFixed(7)}</td>
+                        <td class="px-4 py-2 text-gray-600">${p[1].toFixed(7)}</td>
+                    </tr>
+                `).join('');
+            }
+            const lats = SERVICE_AREA.map(p => p[0]);
+            const lngs = SERVICE_AREA.map(p => p[1]);
+            const minLat = Math.min(...lats), maxLat = Math.max(...lats);
+            const minLng = Math.min(...lngs), maxLng = Math.max(...lngs);
+            const latSpan = maxLat - minLat;
+            const lngSpan = maxLng - minLng;
+            setText('boundary-span-lat',
+                latSpan.toFixed(4) + '° (~' + Math.round(latSpan * 111) + ' km)');
+            setText('boundary-span-lng',
+                lngSpan.toFixed(4) + '° (~' +
+                Math.round(lngSpan * 111 * Math.cos(9.61 * Math.PI / 180)) + ' km)');
+            const bookings = getAppBookings();
+            const inside = bookings.filter(b => {
+                const p = b.pickup;
+                return Array.isArray(p) && p.length >= 2 &&
+                    p[0] >= minLat && p[0] <= maxLat && p[1] >= minLng && p[1] <= maxLng;
+            }).length;
+            setText('boundary-inside-count', inside + ' / ' + bookings.length);
+        }
+
+        // — Isang tawag lang: lahat ng stat at tab ay mula sa parehong data ng app.
+        function refreshDashboard() {
+            loadAdminUsers();
+            loadBookings();
+            renderBoundary();
+        }
+
+        function updateRiderStatus(email, newStatus) {
+            // Ang desisyon ay nasa overlay na nakabatay sa email, kaya kahit wala
+            // pang `status` field ang account ng app ay naiingatan ang approval.
+            let overlay = {};
+            try { overlay = JSON.parse(localStorage.getItem(RIDER_STATUS_KEY) || '{}'); } catch (_) {}
+            overlay[email] = newStatus;
+            try { localStorage.setItem(RIDER_STATUS_KEY, JSON.stringify(overlay)); } catch (_) {}
+
+            // I-sync rin sa legacy na admin store kung mayroon doon.
+            try {
+                const legacy = JSON.parse(localStorage.getItem('sakay_bacuag_users') || '[]');
+                const idx = legacy.findIndex(u => u.email === email);
+                if (idx !== -1) {
+                    legacy[idx].status = newStatus;
+                    localStorage.setItem('sakay_bacuag_users', JSON.stringify(legacy));
+                }
+            } catch (_) {}
+
+            refreshDashboard();
+            alert('✅ Nai-update ang status ng rider: ' + String(newStatus).toUpperCase());
+        }
+
+        function approveRider(name) {
+            alert(name + ' has been approved successfully!');
+        }
+
+        function rejectRider(name) {
+            alert(name + ' registration has been rejected. Removed from active list.');
+        }
+
+        function downloadApk() {
+            alert('Simula na ang pag-download ng Sakay_Bacuag_v0.1.0.apk (Starter APK package). Para sa production build, i-run ang "flutter build apk --release".');
+        }
+
+        function changeLogo(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.getElementById('brand-logo-img');
+                    const icon = document.getElementById('brand-logo-svg');
+                    img.src = e.target.result;
+                    img.classList.remove('hidden');
+                    if (icon) icon.classList.add('hidden');
+                    alert('Tagumpay na napalitan ang logo ng E-Bike!');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ---------------------------------------------------------------------------
+        // BOOT — ibinalik ang naka-login na session (dating hindi, kaya tuwing
+        // nire-reload ay muli kang nagma-login kahit may session na) at LIVE SYNC:
+        // kapag may ibang tab (o ang Flutter web app) na nagbago ng bookings o
+        // accounts sa localStorage, awtomatikong na-re-refresh ang dashboard.
+        // ---------------------------------------------------------------------------
+        const SYNC_KEYS = new Set([
+            'sakay_bookings_v1', 'flutter.sakay_bookings_v1',
+            'sakay_accounts_v1', 'flutter.sakay_accounts_v1',
+            'sakay_bacuag_users', RIDER_STATUS_KEY
+        ]);
+
+        function boot() {
+            seedDemoAccounts();
+            let session = null;
+            try { session = localStorage.getItem('sakay_admin_session_v1'); } catch (_) {}
+            if (session) {
+                document.getElementById('admin-name').innerText = session;
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('dashboard-section').classList.remove('hidden');
+                refreshDashboard();
+            }
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (!e.key || !SYNC_KEYS.has(e.key)) return;
+            const dash = document.getElementById('dashboard-section');
+            if (dash && !dash.classList.contains('hidden')) refreshDashboard();
+        });
+
+        boot();
+    </script>
+</body>
+</html>

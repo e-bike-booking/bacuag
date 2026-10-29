@@ -1,0 +1,16 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "riderLocations": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('activeBookingByRider').child($uid).child('passengerUid').val() === auth.uid || auth.token.admin === true)",
+        ".write": false
+      }
+    },
+    "activeBookingByRider": {
+      ".read": false,
+      ".write": false
+    }
+  }
+}

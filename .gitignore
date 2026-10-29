@@ -1,0 +1,14 @@
+.dart_tool/
+.packages
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+android/local.properties
+lib/firebase_options.dart
+functions/node_modules/
+functions/lib/
+.env
+android/.gradle/
+.freebuff/
+*.log

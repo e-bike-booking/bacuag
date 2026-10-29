@@ -1,0 +1,25 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() { return request.auth != null; }
+    function isAdmin() { return signedIn() && request.auth.token.admin == true; }
+
+    match /pickupPhotos/{bookingId}/{fileName} {
+      allow read: if signedIn() && (
+        firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.passengerUid == request.auth.uid
+        || firestore.get(/databases/(default)/documents/bookings/$(bookingId)).data.assignedRiderUid == request.auth.uid
+        || isAdmin()
+      );
+      allow write: if false; // upload through a callable function or validate owner, size, and MIME type first
+    }
+
+    match /riderDocuments/{uid}/{fileName} {
+      allow read: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow write: if false; // private verification documents: server/admin only
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
