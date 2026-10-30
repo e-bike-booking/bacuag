@@ -14,7 +14,8 @@ MIDDLE NAME
 SANTOS
 Address: POBLACION, BACUAG, SURIGAO DEL NORTE
 ''';
-    expect(extractNameFromId(ocr), 'Juan Santos Dela Cruz');
+    // Walang middle name (SANTOS) — given + apelyido lang ang Buong Pangalan.
+    expect(extractNameFromId(ocr), 'Juan Dela Cruz');
   });
 
   test('National ID: nasa kaparehong linya ang label at halaga', () {
@@ -25,7 +26,7 @@ GIVEN NAME: MARIA CLARA
 MIDDLE NAME: GONZALES
 POBLACION BACUAG
 ''';
-    expect(extractNameFromId(ocr), 'Maria Clara Gonzales Reyes');
+    expect(extractNameFromId(ocr), 'Maria Clara Reyes');
   });
 
   test("Voter's Certification: NAME: prefix", () {
@@ -87,7 +88,7 @@ April 01, 1989
 TIRAHAN/ADDRESS
 P-MACAPAGAL, POBLACION, BACUAG, SURIGAO DEL NORTE, PHILIPPINES, 8408
 ''';
-    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+    expect(extractNameFromId(ocr), 'Arnold Paglinawan');
   });
 
   test('PhilID na may OCR noise sa label (APELYDO, PANGALAN)', () {
@@ -100,7 +101,7 @@ GITNANG APELYDO / MIDDLE NAME
 GORGONIO
 POBLACION, BACUAG
 ''';
-    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+    expect(extractNameFromId(ocr), 'Arnold Paglinawan');
   });
 
   test('PhilID na nasa kaparehong linya ang label at halaga', () {
@@ -110,7 +111,7 @@ MGA PANGALAN / GIVEN NAMES ARNOLD
 GITNANG APELYIDO / MIDDLE NAME GORGONIO
 POBLACION, BACUAG
 ''';
-    expect(extractNameFromId(ocr), 'Arnold Gorgonio Paglinawan');
+    expect(extractNameFromId(ocr), 'Arnold Paglinawan');
   });
 
   test('OCR garbage ay hindi nagiging pangalan (all-caps lamang)', () {
@@ -138,6 +139,27 @@ TIRAHAN/ADDRESS
 P-MACAPAGAL, POBLACION, BACUAG,SURIGAO DEL
 NORTE, PHILIPPINES, 8408
 ''';
-    expect(extractNameFromId(ocr), 'Arnold Corgonid Paglinawan');
+    // Kahit maling basa ng OCR ang apelyido (CORGONID), given + apelyido lang
+    // ang ibinabalik — walang middle name.
+    expect(extractNameFromId(ocr), 'Arnold Paglinawan');
+  });
+
+  group('namesMatchId — given name + apelyido lang ang hinihinging tugma', () {
+    test('tumutugma kahit may middle name ang naka-type', () {
+      expect(namesMatchId('Arnold C. Paglinawan', 'Arnold Paglinawan'), isTrue);
+      expect(namesMatchId('Arnold Gorgonio Paglinawan', 'Arnold Paglinawan'), isTrue);
+    });
+
+    test('tumutugma kahit iba ang case / tuldok', () {
+      expect(namesMatchId('ARNOLD  paglinawan', 'Arnold Paglinawan'), isTrue);
+      expect(namesMatchId("Juan Dela-Cruz", "Juan Dela Cruz"), isTrue);
+    });
+
+    test('hindi tumutugma kapag iba ang apelyido o given name', () {
+      expect(namesMatchId('Arnold Reyes', 'Arnold Paglinawan'), isFalse);
+      expect(namesMatchId('Maria Paglinawan', 'Arnold Paglinawan'), isFalse);
+      expect(namesMatchId('Paglinawan', 'Arnold Paglinawan'), isFalse); // kulang
+      expect(namesMatchId('', 'Arnold Paglinawan'), isFalse);
+    });
   });
 }

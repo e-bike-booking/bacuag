@@ -257,6 +257,79 @@ int pendingAutoCancelRemainingSeconds(BookingItem b, {DateTime? now}) {
   return left < 0 ? 0 : left;
 }
 
+/// Tuldok sa mapa na may kumikinang (blinking) na ilaw — ito na ang bagong
+/// sign ng pickup at destination (dating matigas na pindap na nasa gitna ng
+/// icon kaya hindi eksaktong tumutugma sa coordinate). Naka-center ang tuldok
+/// sa point, kaya kitang-kita kung saan talaga nakapuwesto ang pin.
+class BlinkingMapDot extends StatefulWidget {
+  const BlinkingMapDot({super.key, this.color = Colors.red, this.size = 40});
+
+  final Color color;
+  final double size;
+
+  @override
+  State<BlinkingMapDot> createState() => _BlinkingMapDotState();
+}
+
+class _BlinkingMapDotState extends State<BlinkingMapDot>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 850),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, _) {
+        final t = _controller.value; // 0 -> 1: ang "blink" ng ilaw
+        return SizedBox(
+          width: widget.size,
+          height: widget.size,
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              // Halo na kumikinang — lumiliit at humihina nang paulit-ulit.
+              Container(
+                width: widget.size * (0.55 + 0.45 * t),
+                height: widget.size * (0.55 + 0.45 * t),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.color.withValues(alpha: 0.35 * (1 - t)),
+                ),
+              ),
+              // Ang tuldok — eksaktong nasa coordinate ng pin.
+              Container(
+                width: widget.size * 0.42,
+                height: widget.size * 0.42,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.color,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: widget.color.withValues(alpha: 0.25 + 0.5 * t),
+                      blurRadius: 5 + 5 * t,
+                      spreadRadius: 1.5 * t,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
 /// Mga tile layer ng map ayon sa mode: OSM lansangan (street view), o
 /// Esri satellite na may transparentong label overlay.
 List<Widget> mapTileLayers({required bool satellite}) => [
@@ -485,7 +558,6 @@ String? extractNameFromId(String rawText) {
   //    ang mga label.
   String? surname;
   String? given;
-  String? middle;
 
   bool hasPhrase(String u, String phrase) =>
       phrase.split(' ').every((w) => containsWord(u, w));
@@ -569,14 +641,11 @@ String? extractNameFromId(String rawText) {
     if (v == null || v.isEmpty) continue;
     if (kind == 'surname') surname ??= v;
     if (kind == 'given') given ??= v;
-    if (kind == 'middle') middle ??= v;
+    // Ang "middle" label ay sinasadyang hindi kinukuha — walang middle name
+    // sa "Buong Pangalan" (given name + apelyido lang, gaya ng hiling ng LGU).
   }
   if (given != null && surname != null) {
-    final full = [
-      given,
-      if (middle != null && middle.isNotEmpty) middle,
-      surname,
-    ].join(' ');
+    final full = [given, surname].join(' ');
     return _titleCaseName(full);
   }
 
@@ -611,6 +680,25 @@ String? extractNameFromId(String rawText) {
     }
   }
   return null;
+}
+
+/// Tinutugma ang naka-type na pangalan sa pangalan na nabasa mula sa ID.
+/// Dapat pareho ang UNANG salita (given name) at HULING salita (apelyido);
+/// ang gitnang salita (middle name) ay hindi tinitingnan — kaya kahit may
+/// nakasulat na middle ang user, basta eksakto ang given name at apelyido sa
+/// ID ang pag-sign up ay tuloy. Kapag magkaiba, hindi itutuloy ang signup.
+bool namesMatchId(String typedName, String idName) {
+  List<String> parts(String s) => s
+      .toLowerCase()
+      .replaceAll(RegExp(r'[^a-z\s]'), ' ')
+      .split(RegExp(r'\s+'))
+      .where((w) => w.isNotEmpty)
+      .toList();
+
+  final typed = parts(typedName);
+  final fromId = parts(idName);
+  if (typed.length < 2 || fromId.length < 2) return false;
+  return typed.first == fromId.first && typed.last == fromId.last;
 }
 
 /// Decides whether the OCR text of an uploaded ID is acceptable.
@@ -1632,6 +1720,9 @@ class _RoleHomeState extends State<RoleHome> {
     bool isIdValid = false;
     String errorMessage = '';
     bool dialogOpen = true;
+    // Pangalan na nabasa mula sa ID — dito hinahambing ang naka-type na
+    // "Buong Pangalan" bago tuloyan ang sign up.
+    String detectedIdName = '';
 
     void closeDialog() {
       dialogOpen = false;
@@ -1666,13 +1757,23 @@ class _RoleHomeState extends State<RoleHome> {
       final result = await scanIdCard(pickedId.path, selectedIdType);
       if (!dialogOpen) return;
       final detectedName = result.valid ? extractNameFromId(result.rawText) : null;
+      final typedNow = nameC.text.trim();
+      final mismatch =
+          detectedName != null && typedNow.isNotEmpty && !namesMatchId(typedNow, detectedName);
       updateState(() {
         aiScanning = false;
         isIdValid = result.valid;
+        detectedIdName = detectedName ?? '';
         aiResult = result.valid && detectedName != null
             ? '${result.message}\n✅ Na-fill ang Buong Pangalan mula sa ID: $detectedName (palitan kung kinakailangan).'
             : result.message;
-        if (detectedName != null && detectedName.isNotEmpty) {
+        if (mismatch) {
+          aiResult += '\n⚠ Hindi tugma ang naka-type na pangalan ("$typedNow") sa pangalan ng ID '
+              '("$detectedName") — palitan ang Buong Pangalan bago mag-sign up.';
+        }
+        // Awtomatikong fill lang kapag WALA pang naka-type — kaya kung nag-fill
+        // muna siya ng pangalan bago mag-upload, hindi ito napapalitan.
+        if (detectedName != null && detectedName.isNotEmpty && typedNow.isEmpty) {
           nameC.text = detectedName;
         }
       });
@@ -1782,18 +1883,33 @@ class _RoleHomeState extends State<RoleHome> {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => pickAndScanId(ImageSource.camera, 'camera', setDialogState),
-                          icon: const Icon(Icons.photo_camera),
-                          label: Text(idFile == null ? 'Kunan ng ID' : 'Ulitin'),
+                        child: SizedBox(
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: () => pickAndScanId(ImageSource.camera, 'camera', setDialogState),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 8)),
+                            icon: const Icon(Icons.photo_camera, size: 18),
+                            label: Text(
+                              idFile == null ? 'Kunan ng ID' : 'Ulitin',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => pickAndScanId(ImageSource.gallery, 'gallery', setDialogState),
-                          icon: const Icon(Icons.photo_library),
-                          label: const Text('Gallery'),
+                        child: SizedBox(
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: () => pickAndScanId(ImageSource.gallery, 'gallery', setDialogState),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 8)),
+                            icon: const Icon(Icons.photo_library, size: 18),
+                            label: const Text('Gallery',
+                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ),
                     ],
@@ -1896,6 +2012,16 @@ class _RoleHomeState extends State<RoleHome> {
                       errorMessage = 'Hindi beripikado ang ID. Kailangang may Bacuag address ang ID.');
                   return;
                 }
+                // 🔎 Dapat eksaktong tugma ang Given Name at Apelyido sa ID —
+                // kung hindi, HINDI itutuloy ang sign up.
+                if (detectedIdName.isNotEmpty &&
+                    !namesMatchId(nameC.text.trim(), detectedIdName)) {
+                  setDialogState(() => errorMessage =
+                      'Hindi tugma ang Buong Pangalan ("${nameC.text.trim()}") sa pangalan ng ID '
+                      '("$detectedIdName"). Dapat eksaktong tugma ang Given Name at Apelyido '
+                      'sa Verified ID bago mag-sign up.');
+                  return;
+                }
                 final signupError = AccountStore().signUp(
                   name: nameC.text.trim(),
                   phone: phoneC.text.trim(),
@@ -1942,11 +2068,16 @@ class _RoleHomeState extends State<RoleHome> {
         // Naka-`off` kung wala ang asset para hindi mag-crash sa web/tests.
         leading: Padding(
           padding: const EdgeInsets.all(8),
-          child: Image.asset(
-            'assets/logo.png',
-            fit: BoxFit.contain,
-            errorBuilder: (_, __, ___) =>
-                const Icon(Icons.electric_rickshaw, color: Colors.white),
+          // Bilog ang gilid ng puting border — sinusundan ang kurba ng logo
+          // mismo (dati: matigas na parisukat na sulok sa header).
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.asset(
+              'assets/logo.png',
+              fit: BoxFit.contain,
+              errorBuilder: (_, __, ___) =>
+                  const Icon(Icons.electric_rickshaw, color: Colors.white),
+            ),
           ),
         ),
         title: Text(mode == 0 ? 'E-Bike — Passenger' : 'E-Bike — Rider Dashboard'),
@@ -2113,6 +2244,8 @@ class _PassengerScreenState extends State<PassengerScreen> {
     String errorMessage = '';
     bool isLoginMode = false;
     bool dialogOpen = true;
+    // Pangalan na nabasa mula sa ID — paghahambingan ng naka-type na pangalan.
+    String detectedIdName = '';
 
     void closeDialog() {
       dialogOpen = false;
@@ -2148,13 +2281,23 @@ class _PassengerScreenState extends State<PassengerScreen> {
       // tamang nilalagay ang pangalan nila, ID na ang pinagmumulan ng katotohanan.
       final detectedName =
           result.valid ? extractNameFromId(result.rawText) : null;
+      final typedNow = regName.text.trim();
+      final mismatch =
+          detectedName != null && typedNow.isNotEmpty && !namesMatchId(typedNow, detectedName);
       updateState(() {
         aiScanning = false;
         isIdValid = result.valid;
+        detectedIdName = detectedName ?? '';
         aiResult = result.valid && detectedName != null
             ? '${result.message}\n✅ Na-fill ang Buong Pangalan mula sa ID: $detectedName (palitan kung kinakailangan).'
             : result.message;
-        if (detectedName != null && detectedName.isNotEmpty) {
+        if (mismatch) {
+          aiResult += '\n⚠ Hindi tugma ang naka-type na pangalan ("$typedNow") sa pangalan ng ID '
+              '("$detectedName") — palitan ang Buong Pangalan bago mag-sign up.';
+        }
+        // Fill lang kapag WALA pang naka-type — hindi pinapalitan ang pangalan
+        // na manwal na nilagay ng user.
+        if (detectedName != null && detectedName.isNotEmpty && typedNow.isEmpty) {
           regName.text = detectedName;
         }
       });
@@ -2273,18 +2416,33 @@ class _PassengerScreenState extends State<PassengerScreen> {
                   Row(
                     children: [
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => pickAndScanId(ImageSource.camera, 'camera', setStateDialog),
-                          icon: const Icon(Icons.photo_camera),
-                          label: Text(regIdFile == null ? 'Kunan ng litrato' : 'Ulitin (Camera)'),
+                        child: SizedBox(
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: () => pickAndScanId(ImageSource.camera, 'camera', setStateDialog),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 8)),
+                            icon: const Icon(Icons.photo_camera, size: 18),
+                            label: Text(
+                              regIdFile == null ? 'Kunan ng litrato' : 'Ulitin (Camera)',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => pickAndScanId(ImageSource.gallery, 'gallery', setStateDialog),
-                          icon: const Icon(Icons.photo_library),
-                          label: const Text('Piliin sa Gallery'),
+                        child: SizedBox(
+                          height: 44,
+                          child: OutlinedButton.icon(
+                            onPressed: () => pickAndScanId(ImageSource.gallery, 'gallery', setStateDialog),
+                            style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(horizontal: 8)),
+                            icon: const Icon(Icons.photo_library, size: 18),
+                            label: const Text('Piliin sa Gallery',
+                                maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ),
                         ),
                       ),
                     ],
@@ -2371,6 +2529,17 @@ class _PassengerScreenState extends State<PassengerScreen> {
                   if (!isIdValid) {
                     setStateDialog(() {
                       errorMessage = 'Hindi beripikado ang ID. Kailangang may Bacuag address ang ID.';
+                    });
+                    return;
+                  }
+                  // 🔎 Dapat eksaktong tugma ang Given Name at Apelyido sa ID.
+                  if (detectedIdName.isNotEmpty &&
+                      !namesMatchId(regName.text.trim(), detectedIdName)) {
+                    setStateDialog(() {
+                      errorMessage =
+                          'Hindi tugma ang Buong Pangalan ("${regName.text.trim()}") sa pangalan ng ID '
+                          '("$detectedIdName"). Dapat eksaktong tugma ang Given Name at Apelyido '
+                          'sa Verified ID bago mag-sign up.';
                     });
                     return;
                   }
@@ -3075,14 +3244,14 @@ class _PassengerScreenState extends State<PassengerScreen> {
                                 point: activeBooking!.pickup,
                                 width: 44,
                                 height: 44,
-                                child: const Icon(Icons.location_pin, color: Colors.red, size: 42),
+                                child: const BlinkingMapDot(color: Colors.red),
                               ),
                               if (activeBooking!.destination != null)
                                 Marker(
                                   point: activeBooking!.destination!,
                                   width: 44,
                                   height: 44,
-                                  child: const Icon(Icons.flag, color: Colors.blue, size: 42),
+                                  child: const BlinkingMapDot(color: Colors.blue),
                                 ),
                               Marker(
                                 point: activeBooking!.riderLocation!,
@@ -3103,7 +3272,7 @@ class _PassengerScreenState extends State<PassengerScreen> {
                 },
               ),
               const SizedBox(height: 8),
-              const Text(' pulang pin = Pickup | asul na watawat = Destination | berde = Rider', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              const Text(' pulang tuldok (kumikinang) = Pickup | asul na tuldok (kumikinang) = Destination | berde = Rider', style: TextStyle(fontSize: 12, color: Colors.grey)),
             ],
             const SizedBox(height: 16),
             if (activeBooking!.status == 'pending')
@@ -3223,14 +3392,14 @@ class _PassengerScreenState extends State<PassengerScreen> {
                       point: pickup!,
                       width: 44,
                       height: 44,
-                      child: const Icon(Icons.location_pin, color: Colors.red, size: 42),
+                      child: const BlinkingMapDot(color: Colors.red),
                     ),
                   if (destination != null)
                     Marker(
                       point: destination!,
                       width: 44,
                       height: 44,
-                      child: const Icon(Icons.flag, color: Colors.blue, size: 42),
+                      child: const BlinkingMapDot(color: Colors.blue),
                     ),
                 ]),
                 mapModeToggle(
@@ -3658,14 +3827,14 @@ class _RiderScreenState extends State<RiderScreen> {
                                 point: booking.pickup,
                                 width: 50,
                                 height: 50,
-                                child: const Icon(Icons.location_pin, color: Colors.red, size: 44),
+                                child: const BlinkingMapDot(color: Colors.red),
                               ),
                               if (booking.destination != null)
                                 Marker(
                                   point: booking.destination!,
                                   width: 50,
                                   height: 50,
-                                  child: const Icon(Icons.flag, color: Colors.blue, size: 44),
+                                  child: const BlinkingMapDot(color: Colors.blue),
                                 ),
                               if (booking.riderLocation != null)
                                 Marker(
